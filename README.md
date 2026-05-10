@@ -6,7 +6,6 @@
 
 > **Generate. Refine. Travel.**
 
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Visit_App-C9A84C?style=for-the-badge)](http://localhost:3000)
 [![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Next.js](https://img.shields.io/badge/Next.js-Frontend-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
 [![Gemini AI](https://img.shields.io/badge/Gemini_2.5_Flash-AI_Engine-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://deepmind.google/gemini)
@@ -267,12 +266,12 @@ Visit `http://localhost:3000` and click **Start Exploring** to begin your journe
 
 ## 📖 API Documentation
 
-FastAPI auto-generates interactive documentation:
+FastAPI auto-generates interactive documentation once the backend is running:
 
-| Type | URL |
+| Type | Path |
 |---|---|
-| **Swagger UI** | [http://localhost:8000/docs](http://localhost:8000/docs) |
-| **ReDoc** | [http://localhost:8000/redoc](http://localhost:8000/redoc) |
+| **Swagger UI** | `/docs` |
+| **ReDoc** | `/redoc` |
 
 ### Key Endpoints
 
@@ -417,7 +416,7 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 <br/>
 
-**[🚀 Try the Demo](http://localhost:3000)** &nbsp;·&nbsp; **[📖 API Docs](http://localhost:8000/docs)** &nbsp;·&nbsp; **[🐛 Report a Bug](https://github.com/your-username/traveloop/issues)**
+**[🐛 Report a Bug](https://github.com/your-username/traveloop/issues)**
 
 <br/>
 
