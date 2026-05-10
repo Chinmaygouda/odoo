@@ -1,7 +1,0 @@
-# This file is typically used for Python dependencies.
-# Since your main stack is Node.js (Express, pg), you will use package.json for those.
-# If you plan to add a Python service later, you can list your dependencies here (e.g., Flask, psycopg2-binary, python-dotenv).
-
-# python-dotenv==1.0.0
-# psycopg2-binary==2.9.9
-# Flask==3.0.0
