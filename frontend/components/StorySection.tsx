@@ -41,7 +41,7 @@ export function StorySection() {
              whileHover={{ y: -10, rotate: -2 }}
              transition={{ type: "spring", stiffness: 300, damping: 20 }}
            >
-             <Image src="https://images.unsplash.com/photo-1542314831-c6a4d1421074?q=80&w=2000&auto=format&fit=crop" alt="Luxury Travel" fill className="object-cover opacity-80 mix-blend-luminosity hover:mix-blend-normal transition-all duration-700" />
+             <Image src="https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=2000&auto=format&fit=crop" alt="Luxury Travel" fill className="object-cover opacity-80 mix-blend-luminosity hover:mix-blend-normal transition-all duration-700" />
              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-8">
                 <div>
                   <p className="text-gold font-sans text-xs tracking-widest uppercase mb-2">Santorini Route</p>

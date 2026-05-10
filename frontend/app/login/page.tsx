@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plane, Mail, Lock, User as UserIcon, ArrowRight, Github } from 'lucide-react';
 import { useAuth, User } from '@/lib/hooks';
 import { toast } from '@/components/Toast';
+import { AuthGlobe } from '@/components/AuthGlobe';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -123,16 +124,8 @@ export default function LoginPage() {
           />
         </div>
 
-        {/* World Map SVG Overlay */}
-        <div className="absolute inset-0 opacity-10 pointer-events-none flex items-center justify-center">
-          <svg viewBox="0 0 1000 500" className="w-full max-w-[800px] text-cream">
-            <path d="M150,100 Q400,50 850,100 Q950,250 850,400 Q400,450 150,400 Q50,250 150,100" fill="currentColor" fillOpacity="0.1" />
-            <path d="M200,150 Q300,120 400,150 Q500,200 450,300 Q350,350 250,300 Q150,250 200,150" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="5,5" />
-            <circle cx="300" cy="200" r="4" fill="currentColor" className="animate-pulse" />
-            <circle cx="700" cy="150" r="4" fill="currentColor" className="animate-pulse" />
-            <circle cx="500" cy="350" r="4" fill="currentColor" className="animate-pulse" />
-          </svg>
-        </div>
+        {/* Cinematic 3D Globe Background */}
+        <AuthGlobe />
 
         <div className="relative z-10 text-center">
           <motion.div 

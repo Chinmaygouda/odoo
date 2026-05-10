@@ -4,9 +4,9 @@ import { useRef } from 'react';
 import Image from 'next/image';
 
 const timeline = [
-  { city: "Tokyo", time: "Day 01 - Arrival", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=2000&auto=format&fit=crop" },
+  { city: "Tokyo", time: "Day 01 - Arrival", img: "https://images.unsplash.com/photo-1503899036067-e54911d33e08?q=80&w=2000&auto=format&fit=crop" },
   { city: "Kyoto", time: "Day 04 - Heritage", img: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=2000&auto=format&fit=crop" },
-  { city: "Osaka", time: "Day 08 - Culinary", img: "https://images.unsplash.com/photo-1590559899731-a382839cecd5?q=80&w=2000&auto=format&fit=crop" }
+  { city: "Osaka", time: "Day 08 - Culinary", img: "https://images.unsplash.com/photo-1587595431973-160d0d94add1?q=80&w=2000&auto=format&fit=crop" }
 ];
 
 export function TimelineSection() {
