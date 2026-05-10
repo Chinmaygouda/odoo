@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plane, Mail, Lock, User as UserIcon, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { Plane, Mail, Lock, User as UserIcon, ArrowRight, Github } from 'lucide-react';
 import { useAuth, User } from '@/lib/hooks';
 import { toast } from '@/components/Toast';
+import { AuthGlobe } from '@/components/AuthGlobe';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,10 +14,7 @@ export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -126,16 +124,8 @@ export default function LoginPage() {
           />
         </div>
 
-        {/* World Map SVG Overlay */}
-        <div className="absolute inset-0 opacity-10 pointer-events-none flex items-center justify-center">
-          <svg viewBox="0 0 1000 500" className="w-full max-w-[800px] text-cream">
-            <path d="M150,100 Q400,50 850,100 Q950,250 850,400 Q400,450 150,400 Q50,250 150,100" fill="currentColor" fillOpacity="0.1" />
-            <path d="M200,150 Q300,120 400,150 Q500,200 450,300 Q350,350 250,300 Q150,250 200,150" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="5,5" />
-            <circle cx="300" cy="200" r="4" fill="currentColor" className="animate-pulse" />
-            <circle cx="700" cy="150" r="4" fill="currentColor" className="animate-pulse" />
-            <circle cx="500" cy="350" r="4" fill="currentColor" className="animate-pulse" />
-          </svg>
-        </div>
+        {/* Cinematic 3D Globe Background */}
+        <AuthGlobe />
 
         <div className="relative z-10 text-center">
           <motion.div 
@@ -187,7 +177,7 @@ export default function LoginPage() {
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <AnimatePresence mode="wait">
                 {!isLogin && (
                   <motion.div
@@ -204,8 +194,7 @@ export default function LoginPage() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         required={!isLogin}
-                        placeholder="Enter your full name"
-                        autoComplete="off"
+                        placeholder="John Doe"
                         className="w-full bg-slate/30 border border-slate/50 rounded-2xl py-4 pl-12 pr-4 text-cream placeholder:text-muted focus:outline-none focus:border-gold/50 focus:bg-slate/50 transition-all"
                       />
                     </div>
@@ -217,15 +206,14 @@ export default function LoginPage() {
                 <label className="text-xs uppercase tracking-widest text-muted font-bold ml-1">Email Address</label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
-                    <input 
-                      type="email" 
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      placeholder="Enter your email"
-                      autoComplete="off"
-                      className="w-full bg-slate/30 border border-slate/50 rounded-2xl py-4 pl-12 pr-4 text-cream placeholder:text-muted focus:outline-none focus:border-gold/50 focus:bg-slate/50 transition-all"
-                    />
+                  <input 
+                    type="email" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    placeholder="traveler@luxury.com"
+                    className="w-full bg-slate/30 border border-slate/50 rounded-2xl py-4 pl-12 pr-4 text-cream placeholder:text-muted focus:outline-none focus:border-gold/50 focus:bg-slate/50 transition-all"
+                  />
                 </div>
               </div>
 
@@ -237,55 +225,15 @@ export default function LoginPage() {
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
                   <input 
-                    type={showPassword ? "text" : "password"} 
+                    type="password" 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    placeholder="Enter your password"
-                    autoComplete="new-password"
-                    className="w-full bg-slate/30 border border-slate/50 rounded-2xl py-4 pl-12 pr-12 text-cream placeholder:text-muted focus:outline-none focus:border-gold/50 focus:bg-slate/50 transition-all"
+                    placeholder="••••••••"
+                    className="w-full bg-slate/30 border border-slate/50 rounded-2xl py-4 pl-12 pr-4 text-cream placeholder:text-muted focus:outline-none focus:border-gold/50 focus:bg-slate/50 transition-all"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted hover:text-gold transition-colors"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
                 </div>
               </div>
-
-              <AnimatePresence mode="wait">
-                {!isLogin && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="space-y-2"
-                  >
-                    <label className="text-xs uppercase tracking-widest text-muted font-bold ml-1">Confirm Password</label>
-                    <div className="relative">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
-                      <input 
-                        type={showConfirmPassword ? "text" : "password"} 
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        required={!isLogin}
-                        placeholder="Confirm your password"
-                        autoComplete="new-password"
-                        className="w-full bg-slate/30 border border-slate/50 rounded-2xl py-4 pl-12 pr-12 text-cream placeholder:text-muted focus:outline-none focus:border-gold/50 focus:bg-slate/50 transition-all"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-muted hover:text-gold transition-colors"
-                      >
-                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
 
               <button 
                 type="submit" 
@@ -309,28 +257,26 @@ export default function LoginPage() {
               <div className="h-[1px] flex-1 bg-slate/50" />
             </div>
 
-            <div className="flex flex-col gap-4 mt-6">
-              <button className="flex items-center justify-center gap-2 py-4 border border-slate/50 rounded-2xl hover:bg-slate/20 transition-all text-sm font-medium">
-                <svg className="w-5 h-5" viewBox="0 0 24 24">
+            <div className="grid grid-cols-2 gap-4 mt-6">
+              <button className="flex items-center justify-center gap-2 py-3 border border-slate/50 rounded-2xl hover:bg-slate/20 transition-all text-xs font-medium">
+                <svg className="w-4 h-4" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                   <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
                   <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" />
                   <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                 </svg>
-                Sign in with Google
+                Google
+              </button>
+              <button className="flex items-center justify-center gap-2 py-3 border border-slate/50 rounded-2xl hover:bg-slate/20 transition-all text-xs font-medium">
+                <Github className="w-4 h-4" />
+                GitHub
               </button>
             </div>
 
             <p className="mt-8 text-center text-sm text-muted">
               {isLogin ? "Don't have an account?" : "Already have an account?"}
               <button 
-                onClick={() => {
-                  setIsLogin(!isLogin);
-                  setEmail('');
-                  setPassword('');
-                  setConfirmPassword('');
-                  setName('');
-                }}
+                onClick={() => setIsLogin(!isLogin)}
                 className="text-gold font-bold ml-2 hover:underline decoration-gold/30 underline-offset-4"
               >
                 {isLogin ? 'Sign Up' : 'Sign In'}
