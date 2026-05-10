@@ -3,28 +3,50 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 10, 10, 10;
-  --background-end-rgb: 10, 10, 10;
+  --obsidian: #0A0A0F;
+  --ink: #111118;
+  --slate: #1A1A28;
+  --gold: #C9A84C;
+  --gold-light: #E8C96A;
+  --teal: #2DD4BF;
+  --cream: #F5F0E8;
+  --muted: #6B6B7A;
+  --ruby: #E85D75;
+  --emerald: #10B981;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-start-rgb));
+  color: var(--cream);
+  background: var(--obsidian);
   overflow-x: hidden;
+  font-family: var(--font-inter), sans-serif;
+}
+
+/* Grain texture overlay */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.02;
+  z-index: 9999;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
 @layer utilities {
   .text-glow {
-    text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+    text-shadow: 0 0 20px rgba(201, 168, 76, 0.4);
   }
   .glow-teal {
-    text-shadow: 0 0 30px rgba(0, 128, 128, 0.4);
+    text-shadow: 0 0 30px rgba(45, 212, 191, 0.4);
   }
   .glass {
     background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.05);
   }
   .glass-card {
@@ -33,10 +55,56 @@ body {
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.08);
   }
+  
+  .shimmer-gold {
+    background: linear-gradient(
+      90deg,
+      rgba(201, 168, 76, 0) 0%,
+      rgba(201, 168, 76, 0.2) 50%,
+      rgba(201, 168, 76, 0) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
 }
 
-/* Hide scrollbar */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Custom Gold Scrollbar */
 ::-webkit-scrollbar {
-  width: 0px;
-  background: transparent; /* make scrollbar transparent */
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--obsidian);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gold);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-light);
+}
+
+/* Page transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 400ms, transform 400ms;
+}
+.page-exit {
+  opacity: 1;
+}
+.page-exit-active {
+  opacity: 0;
+  transition: opacity 400ms;
 }

@@ -2,6 +2,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { StarsCanvas } from './Stars';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRef } from 'react';
 
 export function HeroSection() {
@@ -70,14 +71,16 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 1.8 }}
-          className="flex flex-col sm:flex-row items-center gap-6"
+          className="flex flex-col sm:flex-row items-center gap-8"
         >
-          <button className="relative overflow-hidden glass rounded-full px-8 py-4 font-sans text-xs tracking-widest uppercase transition-all duration-300 hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] group border-gold/30">
-             <span className="relative z-10 font-medium group-hover:text-black transition-colors duration-300">Start Exploring</span>
-             <div className="absolute inset-0 w-full h-full bg-gold transform scale-y-0 origin-bottom group-hover:scale-y-100 transition-transform duration-500 ease-in-out z-0" />
-          </button>
+          <Link href="/dashboard" className="relative group">
+            <button className="px-8 py-4 rounded-full border border-gold/40 font-sans text-[10px] tracking-[0.3em] uppercase transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.3)] bg-gold/5 overflow-hidden relative">
+               <span className="relative z-10 font-bold group-hover:text-black transition-colors duration-300">Start Exploring</span>
+               <div className="absolute inset-0 w-full h-full bg-gold transform scale-y-0 origin-bottom group-hover:scale-y-100 transition-transform duration-500 ease-in-out z-0" />
+            </button>
+          </Link>
           
-          <button className="text-xs font-sans tracking-widest uppercase text-gray-300 hover:text-white transition-colors duration-300 border-b border-transparent hover:border-white pb-1">
+          <button className="text-[10px] font-sans tracking-[0.3em] uppercase text-gray-400 hover:text-white transition-colors duration-300 border-b border-transparent hover:border-white/50 pb-1 font-bold">
              Watch Experience
           </button>
         </motion.div>
