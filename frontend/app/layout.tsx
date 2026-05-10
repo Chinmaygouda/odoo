@@ -12,6 +12,8 @@ export const metadata: Metadata = {
   description: "Experience the art of luxury journey planning.",
 };
 
+import { GoogleWrapper } from "@/components/GoogleWrapper";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -20,9 +22,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${inter.variable} ${playfair.variable} font-sans bg-obsidian text-white antialiased`}>
-        <SmoothScrollProvider>
-          {children}
-        </SmoothScrollProvider>
+        <GoogleWrapper>
+          <SmoothScrollProvider>
+            {children}
+          </SmoothScrollProvider>
+        </GoogleWrapper>
         <ToastContainer />
       </body>
     </html>

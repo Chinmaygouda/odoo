@@ -14,7 +14,8 @@ import {
   Trash2, 
   ExternalLink,
   Settings,
-  Plane
+  Plane,
+  CircleDollarSign
 } from 'lucide-react';
 import { useTrips, Trip } from '@/lib/hooks';
 import Link from 'next/link';

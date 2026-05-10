@@ -6,6 +6,8 @@ import bcrypt
 import jwt
 from typing import Optional
 import os
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 from .. import models, schemas
 from ..database import get_db
@@ -105,6 +107,40 @@ def guest_session(db: Session = Depends(get_db)):
         data={"sub": new_user.email}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+@router.post("/google", response_model=schemas.Token)
+def google_auth(req: schemas.GoogleAuthRequest, db: Session = Depends(get_db)):
+    try:
+        client_id = os.environ.get("GOOGLE_CLIENT_ID")
+        idinfo = id_token.verify_oauth2_token(req.token, requests.Request(), client_id)
+
+        email = idinfo['email']
+        name = idinfo.get('name', '')
+        
+        user = db.query(models.User).filter(models.User.email == email).first()
+        if not user:
+            random_pass = get_password_hash(os.urandom(16).hex())
+            user = models.User(email=email, hashed_password=random_pass)
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+            
+            prefs = models.UserPreference(user_id=user.id, display_name=name)
+            db.add(prefs)
+            db.commit()
+
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": user.email}, expires_delta=access_token_expires
+        )
+        return {"access_token": access_token, "token_type": "bearer"}
+
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Google token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 users_router = APIRouter(prefix="/users", tags=["users"])
 
