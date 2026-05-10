@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const destinations = [
@@ -10,135 +10,144 @@ const destinations = [
   { city: 'Reykjavik', code: 'KEF', lat: '64.14°N', lng: '21.94°W' },
 ];
 
-// Canvas-based particle wormhole
+// Canvas-based radar animation
 function WormholeCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
-
-  const animate = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    canvas.width = canvas.offsetWidth * window.devicePixelRatio;
-    canvas.height = canvas.offsetHeight * window.devicePixelRatio;
-    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-
-    const w = canvas.offsetWidth;
-    const h = canvas.offsetHeight;
-    const cx = w / 2;
-    const cy = h / 2;
-    const time = Date.now() * 0.001;
-
-    ctx.clearRect(0, 0, w, h);
-
-    // --- Concentric radar rings ---
-    for (let i = 0; i < 8; i++) {
-      const r = 40 + i * 45;
-      const pulseOffset = Math.sin(time * 0.8 + i * 0.5) * 0.15;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(212, 175, 55, ${0.06 + pulseOffset})`;
-      ctx.lineWidth = 0.5;
-      ctx.stroke();
-    }
-
-    // --- Radar sweep ---
-    const sweepAngle = time * 0.4;
-    const sweepGrad = ctx.createConicalGradient
-      ? null
-      : ctx.createLinearGradient(cx, cy, cx + 300 * Math.cos(sweepAngle), cy + 300 * Math.sin(sweepAngle));
-
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(sweepAngle);
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.arc(0, 0, 350, -0.15, 0.15);
-    ctx.closePath();
-    const grad = ctx.createLinearGradient(0, 0, 350, 0);
-    grad.addColorStop(0, 'rgba(45, 212, 191, 0.0)');
-    grad.addColorStop(0.5, 'rgba(45, 212, 191, 0.04)');
-    grad.addColorStop(1, 'rgba(45, 212, 191, 0.12)');
-    ctx.fillStyle = grad;
-    ctx.fill();
-    ctx.restore();
-
-    // --- Topographic contour lines ---
-    for (let j = 0; j < 5; j++) {
-      ctx.beginPath();
-      const baseR = 80 + j * 60;
-      for (let a = 0; a <= 360; a += 2) {
-        const rad = (a * Math.PI) / 180;
-        const noise = Math.sin(rad * 3 + time + j) * 15 + Math.sin(rad * 7 - time * 0.5) * 8;
-        const r = baseR + noise;
-        const x = cx + r * Math.cos(rad);
-        const y = cy + r * Math.sin(rad);
-        if (a === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-      ctx.strokeStyle = `rgba(212, 175, 55, ${0.08 - j * 0.012})`;
-      ctx.lineWidth = 0.6;
-      ctx.stroke();
-    }
-
-    // --- Floating particles ---
-    for (let i = 0; i < 60; i++) {
-      const seed = i * 137.508;
-      const angle = time * 0.1 + seed;
-      const dist = 50 + (seed % 280);
-      const drift = Math.sin(time * 0.5 + seed) * 20;
-      const x = cx + (dist + drift) * Math.cos(angle);
-      const y = cy + (dist + drift) * Math.sin(angle);
-      const size = 0.5 + (seed % 2);
-      const alpha = 0.15 + Math.sin(time + seed) * 0.15;
-      
-      ctx.beginPath();
-      ctx.arc(x, y, size, 0, Math.PI * 2);
-      ctx.fillStyle = i % 3 === 0
-        ? `rgba(45, 212, 191, ${alpha})`
-        : `rgba(212, 175, 55, ${alpha})`;
-      ctx.fill();
-    }
-
-    // --- Central beacon ---
-    const beaconPulse = Math.sin(time * 2) * 0.3 + 0.7;
-    const beaconGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 30);
-    beaconGrad.addColorStop(0, `rgba(212, 175, 55, ${0.3 * beaconPulse})`);
-    beaconGrad.addColorStop(0.5, `rgba(212, 175, 55, ${0.1 * beaconPulse})`);
-    beaconGrad.addColorStop(1, 'rgba(212, 175, 55, 0)');
-    ctx.beginPath();
-    ctx.arc(cx, cy, 30, 0, Math.PI * 2);
-    ctx.fillStyle = beaconGrad;
-    ctx.fill();
-
-    // Core dot
-    ctx.beginPath();
-    ctx.arc(cx, cy, 2, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(212, 175, 55, ${0.6 + beaconPulse * 0.4})`;
-    ctx.fill();
-
-    // --- Crosshairs ---
-    ctx.strokeStyle = 'rgba(212, 175, 55, 0.08)';
-    ctx.lineWidth = 0.5;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy - 350);
-    ctx.lineTo(cx, cy + 350);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(cx - 350, cy);
-    ctx.lineTo(cx + 350, cy);
-    ctx.stroke();
-
-    animRef.current = requestAnimationFrame(animate);
-  }, []);
+  const sizeRef = useRef({ w: 0, h: 0 });
 
   useEffect(() => {
-    animRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animRef.current);
-  }, [animate]);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    // Size canvas once and on resize
+    const resize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      sizeRef.current = { w: rect.width, h: rect.height };
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    const ctx = canvas.getContext('2d')!;
+
+    const draw = () => {
+      const dpr = window.devicePixelRatio || 1;
+      const { w, h } = sizeRef.current;
+      const cx = w / 2;
+      const cy = h / 2;
+      const time = performance.now() * 0.001;
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+
+      // --- Concentric radar rings ---
+      for (let i = 0; i < 8; i++) {
+        const r = 40 + i * 45;
+        const pulseOffset = Math.sin(time * 0.8 + i * 0.5) * 0.15;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(212, 175, 55, ${(0.06 + pulseOffset).toFixed(3)})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+
+      // --- Radar sweep ---
+      const sweepAngle = time * 0.4;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(sweepAngle);
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.arc(0, 0, 350, -0.15, 0.15);
+      ctx.closePath();
+      const grad = ctx.createLinearGradient(0, 0, 350, 0);
+      grad.addColorStop(0, 'rgba(45, 212, 191, 0.0)');
+      grad.addColorStop(0.5, 'rgba(45, 212, 191, 0.06)');
+      grad.addColorStop(1, 'rgba(45, 212, 191, 0.18)');
+      ctx.fillStyle = grad;
+      ctx.fill();
+      ctx.restore();
+
+      // --- Topographic contour lines ---
+      for (let j = 0; j < 5; j++) {
+        ctx.beginPath();
+        const baseR = 80 + j * 60;
+        for (let a = 0; a <= 360; a += 2) {
+          const rad = (a * Math.PI) / 180;
+          const noise = Math.sin(rad * 3 + time + j) * 15 + Math.sin(rad * 7 - time * 0.5) * 8;
+          const r = baseR + noise;
+          const x = cx + r * Math.cos(rad);
+          const y = cy + r * Math.sin(rad);
+          if (a === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.strokeStyle = `rgba(212, 175, 55, ${(0.08 - j * 0.012).toFixed(3)})`;
+        ctx.lineWidth = 0.6;
+        ctx.stroke();
+      }
+
+      // --- Floating particles ---
+      for (let i = 0; i < 60; i++) {
+        const seed = i * 137.508;
+        const angle = time * 0.1 + seed;
+        const dist = 50 + (seed % 280);
+        const drift = Math.sin(time * 0.5 + seed) * 20;
+        const x = cx + (dist + drift) * Math.cos(angle);
+        const y = cy + (dist + drift) * Math.sin(angle);
+        const size = 0.5 + (seed % 2);
+        const alpha = 0.15 + Math.sin(time + seed) * 0.15;
+
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fillStyle = i % 3 === 0
+          ? `rgba(45, 212, 191, ${alpha.toFixed(3)})`
+          : `rgba(212, 175, 55, ${alpha.toFixed(3)})`;
+        ctx.fill();
+      }
+
+      // --- Central beacon ---
+      const beaconPulse = Math.sin(time * 2) * 0.3 + 0.7;
+      const beaconGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 30);
+      beaconGrad.addColorStop(0, `rgba(212, 175, 55, ${(0.3 * beaconPulse).toFixed(3)})`);
+      beaconGrad.addColorStop(0.5, `rgba(212, 175, 55, ${(0.1 * beaconPulse).toFixed(3)})`);
+      beaconGrad.addColorStop(1, 'rgba(212, 175, 55, 0)');
+      ctx.beginPath();
+      ctx.arc(cx, cy, 30, 0, Math.PI * 2);
+      ctx.fillStyle = beaconGrad;
+      ctx.fill();
+
+      // Core dot
+      ctx.beginPath();
+      ctx.arc(cx, cy, 2, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(212, 175, 55, ${(0.6 + beaconPulse * 0.4).toFixed(3)})`;
+      ctx.fill();
+
+      // --- Crosshairs ---
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.08)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - 350);
+      ctx.lineTo(cx, cy + 350);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx - 350, cy);
+      ctx.lineTo(cx + 350, cy);
+      ctx.stroke();
+
+      animRef.current = requestAnimationFrame(draw);
+    };
+
+    animRef.current = requestAnimationFrame(draw);
+
+    return () => {
+      cancelAnimationFrame(animRef.current);
+      window.removeEventListener('resize', resize);
+    };
+  }, []);
 
   return (
     <canvas
