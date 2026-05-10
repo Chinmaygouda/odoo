@@ -2,18 +2,18 @@
 
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  CheckSquare, 
-  Square, 
-  Plus, 
-  Trash2, 
-  ChevronDown, 
-  Sparkles, 
-  Printer, 
-  FileText, 
-  Shirt, 
-  Bath, 
-  Smartphone, 
+import {
+  CheckSquare,
+  Square,
+  Plus,
+  Trash2,
+  ChevronDown,
+  Sparkles,
+  Printer,
+  FileText,
+  Shirt,
+  Bath,
+  Smartphone,
   Briefcase,
   X,
   Circle
@@ -67,7 +67,7 @@ export default function ChecklistPage() {
     if (!selectedTripId) return;
     const trip = trips.find(t => t.id === selectedTripId);
     toast.info('AI is analyzing your journey...');
-    
+
     // Hardcoded "Smart" suggestions based on destination
     const suggestions = [
       { label: 'Universal Power Adapter', cat: 'electronics' },
@@ -97,8 +97,8 @@ export default function ChecklistPage() {
         <div className="space-y-4">
           <p className="text-gold uppercase tracking-[0.4em] text-[10px] font-bold">Preparation</p>
           <div className="flex items-center gap-4">
-            <select 
-              value={selectedTripId || ''} 
+            <select
+              value={selectedTripId || ''}
               onChange={(e) => setSelectedTripId(e.target.value)}
               className="bg-slate/20 border border-slate/50 rounded-2xl p-4 pr-12 text-2xl font-playfair appearance-none focus:border-gold outline-none transition-all"
             >
@@ -110,13 +110,13 @@ export default function ChecklistPage() {
         </div>
 
         <div className="flex items-center gap-4">
-          <button 
+          <button
             onClick={handleAiSuggest}
             className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-gold/10 border border-gold/30 text-gold text-xs font-bold uppercase tracking-widest hover:bg-gold/20 transition-all group"
           >
             <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" /> AI Suggest
           </button>
-          <button 
+          <button
             onClick={() => window.print()}
             className="p-3 rounded-2xl border border-slate/50 text-muted hover:text-cream transition-all"
           >
@@ -132,8 +132,8 @@ export default function ChecklistPage() {
             <div className="relative w-48 h-48 mx-auto flex items-center justify-center">
               <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
                 <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate/30" />
-                <motion.circle 
-                  cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="5" 
+                <motion.circle
+                  cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="5"
                   className="text-gold"
                   strokeDasharray="283"
                   initial={{ strokeDashoffset: 283 }}
@@ -146,7 +146,7 @@ export default function ChecklistPage() {
                 <span className="text-[10px] uppercase tracking-widest text-muted font-bold">Packed</span>
               </div>
             </div>
-            
+
             <div className="space-y-1">
               <h3 className="text-2xl font-playfair">{stats.checked} of {stats.total} items</h3>
               <p className="text-sm text-muted">Ready for departure</p>
@@ -158,7 +158,7 @@ export default function ChecklistPage() {
         <div className="lg:col-span-2 space-y-4">
           {CATEGORIES.map(cat => (
             <div key={cat.id} className="glass-card rounded-[2rem] overflow-hidden">
-              <button 
+              <button
                 onClick={() => toggleCat(cat.id)}
                 className="w-full p-6 flex items-center justify-between hover:bg-slate/10 transition-all"
               >
@@ -176,7 +176,7 @@ export default function ChecklistPage() {
 
               <AnimatePresence>
                 {expandedCats.includes(cat.id) && (
-                  <motion.div 
+                  <motion.div
                     initial={{ height: 0 }}
                     animate={{ height: 'auto' }}
                     exit={{ height: 0 }}
@@ -185,7 +185,7 @@ export default function ChecklistPage() {
                     <div className="px-6 pb-6 pt-2 space-y-2">
                       {checklist.filter(c => c.category === cat.id).map(item => (
                         <div key={item.id} className="flex items-center gap-4 py-3 group">
-                          <button 
+                          <button
                             onClick={() => toggleItem(item.id)}
                             className={`transition-colors ${item.isChecked ? 'text-emerald' : 'text-muted group-hover:text-gold'}`}
                           >
@@ -194,7 +194,7 @@ export default function ChecklistPage() {
                           <span className={`flex-1 text-sm transition-all ${item.isChecked ? 'text-muted line-through opacity-50 translate-x-2' : 'text-cream'}`}>
                             {item.label}
                           </span>
-                          <button 
+                          <button
                             onClick={() => deleteItem(item.id)}
                             className="text-muted hover:text-ruby opacity-0 group-hover:opacity-100 transition-all"
                           >
@@ -206,9 +206,9 @@ export default function ChecklistPage() {
                       {addingToCat === cat.id ? (
                         <div className="flex items-center gap-4 py-2">
                           <Circle className="w-5 h-5 text-muted" />
-                          <input 
+                          <input
                             autoFocus
-                            type="text" 
+                            type="text"
                             value={newItemLabel}
                             onChange={(e) => setNewItemLabel(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleAddItem(cat.id)}
@@ -220,7 +220,7 @@ export default function ChecklistPage() {
                           </button>
                         </div>
                       ) : (
-                        <button 
+                        <button
                           onClick={() => setAddingToCat(cat.id)}
                           className="flex items-center gap-4 py-3 text-muted hover:text-gold transition-all text-sm w-full text-left italic"
                         >

@@ -14,7 +14,8 @@ import {
   Trash2, 
   ExternalLink,
   Settings,
-  Plane
+  Plane,
+  CircleDollarSign
 } from 'lucide-react';
 import { useTrips, Trip } from '@/lib/hooks';
 import Link from 'next/link';
@@ -49,28 +50,28 @@ export default function MyTrips() {
   };
 
   return (
-    <div className="space-y-8 pb-20">
+    <div className="space-y-8 pb-32">
       {/* Header & Controls */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 px-1">
         <div className="space-y-2">
           <p className="text-gold uppercase tracking-[0.4em] text-[10px] font-bold">Archives</p>
           <h1 className="font-playfair text-4xl md:text-5xl font-light">Your Journeys</h1>
         </div>
 
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="relative group">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+          <div className="relative group flex-1 sm:flex-initial">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted group-focus-within:text-gold transition-colors" />
             <input 
               type="text" 
               placeholder="Search journeys..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-slate/20 border border-slate/50 rounded-2xl py-3 pl-12 pr-6 focus:outline-none focus:border-gold transition-all w-64"
+              className="bg-slate/20 border border-slate/50 rounded-2xl py-3.5 pl-12 pr-6 focus:outline-none focus:border-gold transition-all w-full sm:w-64 text-sm"
             />
           </div>
           
-          <Link href="/trips/new">
-            <button className="bg-gold hover:bg-gold-light text-obsidian px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-gold/10">
+          <Link href="/trips/new" className="w-full sm:w-auto">
+            <button className="w-full bg-gold hover:bg-gold-light text-obsidian px-8 py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-gold/10">
               <Plus className="w-5 h-5" />
               New Journey
             </button>
@@ -79,12 +80,12 @@ export default function MyTrips() {
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2">
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
         {filters.map(filter => (
           <button
             key={filter}
             onClick={() => setActiveFilter(filter)}
-            className={`px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap ${
+            className={`px-6 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all whitespace-nowrap ${
               activeFilter === filter 
                 ? 'bg-gold text-obsidian shadow-lg shadow-gold/20' 
                 : 'bg-slate/20 text-muted hover:text-cream border border-slate/50'
@@ -96,7 +97,7 @@ export default function MyTrips() {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
         <AnimatePresence mode="popLayout">
           {filteredTrips.map((trip) => (
             <motion.div
@@ -106,11 +107,11 @@ export default function MyTrips() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
               whileHover={{ y: -8 }}
-              className="glass-card rounded-[2.5rem] p-8 group relative overflow-hidden flex flex-col h-[400px]"
+              className="glass-card rounded-[2.5rem] p-6 md:p-8 group relative overflow-hidden flex flex-col min-h-[420px]"
             >
               {/* Status Badge */}
               <div className="absolute top-6 right-6">
-                <span className={`px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] bg-slate/50 border border-slate/50 ${
+                <span className={`px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-[0.2em] bg-slate/50 border border-slate/50 ${
                   trip.status === 'Ongoing' ? 'text-emerald border-emerald/30' :
                   trip.status === 'Upcoming' ? 'text-gold border-gold/30' :
                   'text-muted'
@@ -129,8 +130,8 @@ export default function MyTrips() {
                 
                 <div className="space-y-2">
                   <h3 className="text-2xl font-playfair group-hover:text-gold transition-colors">{trip.name}</h3>
-                  <div className="flex items-center gap-3 text-muted text-sm">
-                    <Calendar className="w-4 h-4" />
+                  <div className="flex items-center gap-3 text-muted text-xs">
+                    <Calendar className="w-4 h-4 text-gold/50" />
                     <span>{new Date(trip.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} — {new Date(trip.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                   </div>
                 </div>
@@ -151,13 +152,13 @@ export default function MyTrips() {
                   </div>
                   <div>
                     <p className="text-[10px] uppercase tracking-widest text-muted font-bold">Budget Status</p>
-                    <p className="text-sm font-medium">On Track • ${trip.budget.toLocaleString()}</p>
+                    <p className="text-xs font-medium">On Track • ${trip.budget.toLocaleString()}</p>
                   </div>
                 </div>
               </div>
 
               {/* Actions Footer */}
-              <div className="pt-8 flex items-center justify-between border-t border-slate/50">
+              <div className="pt-8 mt-6 flex items-center justify-between border-t border-slate/50">
                 <div className="flex gap-1">
                   <button 
                     onClick={() => handleShare(trip.shareToken)}
@@ -175,14 +176,14 @@ export default function MyTrips() {
                   </button>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex gap-2 sm:gap-3">
                   <Link href={`/trips/${trip.id}/builder`}>
-                    <button className="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest border border-slate/50 hover:bg-slate/50 transition-all">
-                      Builder
+                    <button className="px-4 md:px-5 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest border border-slate/50 hover:bg-slate/50 transition-all">
+                      Edit
                     </button>
                   </Link>
                   <Link href={`/trips/${trip.id}/view`}>
-                    <button className="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest bg-gold text-obsidian hover:bg-gold-light transition-all shadow-lg shadow-gold/10">
+                    <button className="px-4 md:px-5 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest bg-gold text-obsidian hover:bg-gold-light transition-all shadow-lg shadow-gold/10">
                       View
                     </button>
                   </Link>

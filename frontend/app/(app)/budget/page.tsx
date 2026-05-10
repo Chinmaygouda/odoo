@@ -12,7 +12,8 @@ import {
   AlertTriangle,
   ArrowUpRight,
   Receipt,
-  PieChart as PieChartIcon
+  PieChart as PieChartIcon,
+  X
 } from 'lucide-react';
 import { useTrips, useExpenses, Expense } from '@/lib/hooks';
 import { toast } from '@/components/Toast';
@@ -221,57 +222,50 @@ export default function BudgetAnalysis() {
           {/* Simple Expense Log */}
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-playfair">Expense Log</h2>
+              <h2 className="text-xl md:text-2xl font-playfair">Expense Log</h2>
               <button 
                 onClick={() => setIsAddingExpense(true)}
-                className="text-xs uppercase tracking-widest text-gold hover:text-gold-light font-bold flex items-center gap-2 group"
+                className="text-[10px] md:text-xs uppercase tracking-widest text-gold hover:text-gold-light font-bold flex items-center gap-2 group"
               >
                 <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-500" /> Log Expense
               </button>
             </div>
 
-            <div className="glass-card rounded-[2.5rem] overflow-hidden">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-slate/30 text-[10px] uppercase tracking-widest text-muted">
-                  <tr>
-                    <th className="px-8 py-5 font-bold">Description</th>
-                    <th className="px-8 py-5 font-bold">Category</th>
-                    <th className="px-8 py-5 font-bold">Date</th>
-                    <th className="px-8 py-5 font-bold text-right">Amount</th>
-                    <th className="px-8 py-5"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate/50">
-                  {tripExpenses.length > 0 ? tripExpenses.map(exp => (
-                    <tr key={exp.id} className="group hover:bg-slate/10 transition-colors">
-                      <td className="px-8 py-5 font-medium">{exp.description}</td>
-                      <td className="px-8 py-5">
-                        <span className="px-3 py-1 rounded-full bg-slate/50 text-[10px] uppercase tracking-widest font-bold">
-                          {exp.category}
-                        </span>
-                      </td>
-                      <td className="px-8 py-5 text-muted">{new Date(exp.date).toLocaleDateString()}</td>
-                      <td className="px-8 py-5 text-right font-bold text-cream">
-                        {currency.symbol}{convert(exp.amount)}
-                      </td>
-                      <td className="px-8 py-5 text-right">
-                        <button 
-                          onClick={() => { deleteExpense(exp.id); toast.success('Expense removed.'); }}
-                          className="text-muted hover:text-ruby transition-colors opacity-0 group-hover:opacity-100"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </td>
-                    </tr>
-                  )) : (
-                    <tr>
-                      <td colSpan={5} className="px-8 py-20 text-center text-muted italic opacity-50">
-                        No expenses logged for this journey.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+            <div className="space-y-3 md:space-y-4">
+              {tripExpenses.length > 0 ? tripExpenses.map(exp => (
+                <div key={exp.id} className="glass-card p-4 md:p-5 rounded-2xl md:rounded-[2rem] flex flex-col sm:flex-row sm:items-center justify-between gap-4 group hover:border-gold/30 transition-all">
+                  <div className="flex items-start sm:items-center gap-4">
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-slate/50 flex items-center justify-center shrink-0">
+                      <Receipt className="w-5 h-5 text-muted" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-sm md:text-base text-cream">{exp.description}</h4>
+                      <div className="flex items-center gap-3 mt-1 text-[10px] md:text-xs text-muted">
+                        <span className="uppercase tracking-widest font-bold text-gold/80">{exp.category}</span>
+                        <span>•</span>
+                        <span>{new Date(exp.date).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between sm:justify-end gap-6 border-t sm:border-t-0 border-slate/10 pt-3 sm:pt-0 w-full sm:w-auto">
+                    <span className="font-bold text-lg md:text-xl text-cream">
+                      {currency.symbol}{convert(exp.amount)}
+                    </span>
+                    <button 
+                      onClick={() => { deleteExpense(exp.id); toast.success('Expense removed.'); }}
+                      className="p-2 -mr-2 text-muted hover:text-ruby transition-colors opacity-100 sm:opacity-0 group-hover:opacity-100"
+                    >
+                      <Trash2 className="w-4 h-4 md:w-5 md:h-5" />
+                    </button>
+                  </div>
+                </div>
+              )) : (
+                <div className="glass-card p-12 rounded-[2rem] text-center text-muted italic opacity-50 flex flex-col items-center justify-center">
+                  <Receipt className="w-12 h-12 mb-4 opacity-50" />
+                  <p>No expenses logged for this journey.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -406,23 +400,3 @@ export default function BudgetAnalysis() {
   );
 }
 
-// Stub for X
-function X(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
-  );
-}

@@ -60,9 +60,9 @@ export default function Dashboard() {
   }, [upcomingTrip]);
 
   return (
-    <div className="space-y-12 pb-24">
+    <div className="space-y-12 pb-32">
       {/* Hero Section */}
-      <section className="relative h-64 md:h-80 rounded-[3rem] overflow-hidden group">
+      <section className="relative h-72 md:h-80 rounded-[2.5rem] md:rounded-[3rem] overflow-hidden group">
         {/* Animated Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-ink via-slate to-obsidian">
           <motion.div 
@@ -75,47 +75,48 @@ export default function Dashboard() {
           />
         </div>
 
-        <div className="relative h-full flex flex-col justify-center px-12 space-y-4">
+        <div className="relative h-full flex flex-col justify-center px-6 md:px-12 space-y-4">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="space-y-1"
           >
             <p className="text-gold uppercase tracking-[0.4em] text-[10px] font-bold">Welcome Back</p>
-            <h1 className="font-playfair text-4xl md:text-5xl font-light">
-              Good morning, <span className="italic">{user?.name.split(' ')[0]}</span>
+            <h1 className="font-playfair text-2xl md:text-5xl font-light leading-tight">
+              Good morning, <br className="md:hidden" />
+              <span className="italic">{user?.name.split(' ')[0]}</span>
             </h1>
           </motion.div>
-          <p className="text-muted max-w-md text-sm md:text-base">
+          <p className="text-muted max-w-md text-xs md:text-base">
             Your next adventure awaits. You have {trips.length} active journeys and {upcomingTrip ? `${daysUntil} days until your next trip.` : 'no upcoming trips planned.'}
           </p>
         </div>
 
         {/* Quick Action FABs */}
-        <div className="absolute right-8 bottom-8 flex gap-3">
+        <div className="absolute right-6 bottom-6 md:right-8 md:bottom-8 flex flex-col md:flex-row gap-3">
           <Link href="/trips/new">
-            <button className="w-14 h-14 rounded-2xl bg-gold hover:bg-gold-light text-obsidian flex items-center justify-center shadow-xl shadow-gold/20 transition-all hover:scale-110 active:scale-95 group/btn">
-              <Plus className="w-6 h-6 group-hover/btn:rotate-90 transition-transform duration-500" />
+            <button className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gold hover:bg-gold-light text-obsidian flex items-center justify-center shadow-xl shadow-gold/20 transition-all hover:scale-110 active:scale-95 group/btn">
+              <Plus className="w-5 h-5 md:w-6 md:h-6 group-hover/btn:rotate-90 transition-transform duration-500" />
             </button>
           </Link>
         </div>
       </section>
 
       {/* Stats Grid */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {stats.map((stat, i) => (
           <motion.div
             key={stat.label}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="glass-card p-6 rounded-3xl group hover:border-gold/30 transition-all"
+            className="glass-card p-5 md:p-6 rounded-3xl group hover:border-gold/30 transition-all"
           >
             <div className={`w-10 h-10 rounded-xl bg-slate/50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
               <stat.icon className={`w-5 h-5 text-${stat.color}`} />
             </div>
-            <p className="text-2xl font-bold tracking-tight mb-1">{stat.value}</p>
-            <p className="text-xs uppercase tracking-widest text-muted font-bold">{stat.label}</p>
+            <p className="text-xl md:text-2xl font-bold tracking-tight mb-1">{stat.value}</p>
+            <p className="text-[10px] uppercase tracking-widest text-muted font-bold">{stat.label}</p>
           </motion.div>
         ))}
       </section>
@@ -123,17 +124,17 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         {/* Recent Trips */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between px-2">
             <h2 className="text-2xl font-playfair">Recent Journeys</h2>
-            <Link href="/trips" className="text-xs uppercase tracking-widest text-gold hover:text-gold-light flex items-center gap-2 group">
+            <Link href="/trips" className="text-[10px] uppercase tracking-widest text-gold hover:text-gold-light flex items-center gap-2 group">
               View All <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex md:grid md:grid-cols-2 gap-6 overflow-x-auto no-scrollbar pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
             {trips.length > 0 ? (
               trips.slice(0, 4).map((trip) => (
-                <div className="glass-card p-6 rounded-3xl hover:border-gold/40 transition-all group overflow-hidden relative">
+                <div key={trip.id} className="min-w-[280px] md:min-w-0 glass-card p-6 rounded-3xl hover:border-gold/40 transition-all group overflow-hidden relative flex-shrink-0">
                   <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
                     <span className="text-6xl">{trip.emoji}</span>
                   </div>
@@ -142,7 +143,7 @@ export default function Dashboard() {
                       <span className="w-8 h-8 rounded-lg bg-slate flex items-center justify-center text-lg">{trip.emoji}</span>
                       <h3 className="font-medium group-hover:text-gold transition-colors">{trip.name}</h3>
                     </Link>
-                    <div className="flex items-center justify-between text-xs text-muted">
+                    <div className="flex items-center justify-between text-[10px] md:text-xs text-muted">
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
@@ -154,7 +155,7 @@ export default function Dashboard() {
                         </div>
                       </div>
                       <Link href={`/trips/${trip.id}/builder`}>
-                        <button className="text-[10px] uppercase tracking-widest text-gold hover:text-gold-light font-bold">
+                        <button className="uppercase tracking-widest text-gold hover:text-gold-light font-bold">
                           Builder
                         </button>
                       </Link>
@@ -163,7 +164,7 @@ export default function Dashboard() {
                 </div>
               ))
             ) : (
-              <div className="col-span-full py-12 glass border-dashed rounded-3xl flex flex-col items-center justify-center text-center space-y-4">
+              <div className="col-span-full w-full py-12 glass border-dashed rounded-3xl flex flex-col items-center justify-center text-center space-y-4">
                 <div className="w-16 h-16 rounded-full bg-slate/30 flex items-center justify-center">
                   <Plane className="w-8 h-8 text-muted" />
                 </div>
@@ -184,14 +185,14 @@ export default function Dashboard() {
         {/* Trending Destinations */}
         <div className="space-y-6">
           <h2 className="text-2xl font-playfair">Editorial Picks</h2>
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-4">
             {[
               { city: 'Santorini', country: 'Greece', gradient: 'from-blue-600/20 to-teal-400/20' },
               { city: 'Kyoto', country: 'Japan', gradient: 'from-ruby/20 to-gold/20' },
               { city: 'Amalfi', country: 'Italy', gradient: 'from-emerald/20 to-blue-400/20' },
             ].map((dest) => (
               <div key={dest.city} className={`h-32 rounded-3xl bg-gradient-to-br ${dest.gradient} border border-slate/50 p-6 flex flex-col justify-end group cursor-pointer hover:border-gold/30 transition-all`}>
-                <p className="text-xs uppercase tracking-widest text-gold font-bold mb-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300">{dest.country}</p>
+                <p className="text-[10px] uppercase tracking-widest text-gold font-bold mb-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300">{dest.country}</p>
                 <h3 className="text-xl font-playfair group-hover:text-gold transition-colors">{dest.city}</h3>
               </div>
             ))}

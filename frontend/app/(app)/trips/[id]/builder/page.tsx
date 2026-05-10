@@ -100,28 +100,28 @@ export default function ItineraryBuilder() {
   if (!trip) return null;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-160px)] gap-8">
+    <div className="flex flex-col h-auto md:h-[calc(100vh-160px)] gap-6 md:gap-8 pb-32 md:pb-0">
       {/* Builder Header */}
-      <div className="flex items-end justify-between border-b border-slate/50 pb-6">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between border-b border-slate/50 pb-6 gap-6">
         <div className="space-y-4">
           <button 
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted hover:text-gold transition-colors"
+            className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-muted hover:text-gold transition-colors"
           >
-            <ChevronLeft className="w-4 h-4" /> Back to Journeys
+            <ChevronLeft className="w-3.5 h-3.5" /> Back to Journeys
           </button>
           <div className="space-y-1">
             <p className="text-gold uppercase tracking-[0.4em] text-[10px] font-bold">Itinerary Builder</p>
-            <h1 className="font-playfair text-4xl">{trip.name}</h1>
-            <div className="flex items-center gap-4 text-xs text-muted">
+            <h1 className="font-playfair text-3xl md:text-4xl leading-tight">{trip.name}</h1>
+            <div className="flex items-center gap-4 text-[10px] md:text-xs text-muted">
               <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {stops.length} Stops</span>
               <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(trip.startDate).toLocaleDateString()}</span>
             </div>
           </div>
         </div>
 
-        <div className="w-64 space-y-2">
-          <div className="flex justify-between text-[10px] uppercase tracking-widest font-bold">
+        <div className="w-full lg:w-72 space-y-2">
+          <div className="flex justify-between text-[9px] md:text-[10px] uppercase tracking-widest font-bold">
             <span className="text-muted">Budget Utilized</span>
             <span className={totalCost > trip.budget ? 'text-ruby' : 'text-emerald'}>${totalCost.toLocaleString()} / ${trip.budget.toLocaleString()}</span>
           </div>
@@ -135,11 +135,27 @@ export default function ItineraryBuilder() {
         </div>
       </div>
 
-      <div className="flex gap-8 flex-1 overflow-hidden">
+      {/* Mobile Tabs */}
+      <div className="flex md:hidden items-center p-1 bg-ink/50 border border-slate/50 rounded-2xl">
+        <button 
+          onClick={() => setSelectedStopId(stops[0]?.id || null)}
+          className={`flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${!selectedStopId || stops.find(s => s.id === selectedStopId) ? 'bg-gold text-obsidian' : 'text-muted'}`}
+        >
+          Stops
+        </button>
+        <button 
+          onClick={() => setSelectedStopId(selectedStopId || stops[0]?.id || null)}
+          className={`flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${selectedStopId ? 'bg-gold text-obsidian' : 'text-muted'}`}
+        >
+          Activities
+        </button>
+      </div>
+
+      <div className="flex flex-col md:flex-row gap-8 flex-1 overflow-hidden">
         {/* Left: Stops List */}
-        <div className="w-80 flex flex-col gap-4">
+        <div className={`${selectedStopId && window.innerWidth < 768 ? 'hidden' : 'flex'} w-full md:w-[35%] lg:w-[30%] flex-col gap-4`}>
           <div className="flex items-center justify-between px-2">
-            <h3 className="text-xs uppercase tracking-[0.2em] font-bold text-muted">Stops List</h3>
+            <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted">Stops List</h3>
             <button className="text-gold hover:text-gold-light"><Plus className="w-4 h-4" /></button>
           </div>
           
@@ -169,8 +185,8 @@ export default function ItineraryBuilder() {
                     <MapPin className="w-5 h-5" />
                   </div>
                   <div className="flex-1">
-                    <p className={`font-medium ${selectedStopId === stop.id ? 'text-gold' : 'text-cream'}`}>{stop.city}</p>
-                    <p className="text-[10px] text-muted uppercase tracking-wider">{stop.country}</p>
+                    <p className={`font-medium text-sm ${selectedStopId === stop.id ? 'text-gold' : 'text-cream'}`}>{stop.city}</p>
+                    <p className="text-[9px] text-muted uppercase tracking-wider">{stop.country}</p>
                   </div>
                   <ChevronRight className={`w-4 h-4 text-muted transition-transform ${selectedStopId === stop.id ? 'rotate-90 text-gold' : ''}`} />
                 </div>
@@ -180,30 +196,38 @@ export default function ItineraryBuilder() {
         </div>
 
         {/* Right: Activities Panel */}
-        <div className="flex-1 glass-card rounded-[2.5rem] flex flex-col overflow-hidden">
+        <div className={`${!selectedStopId && window.innerWidth < 768 ? 'hidden' : 'flex'} flex-1 glass-card rounded-[2.5rem] flex flex-col overflow-hidden`}>
           {selectedStop ? (
             <>
-              <div className="p-8 border-b border-slate/50 flex items-center justify-between bg-ink/30">
-                <div className="flex items-center gap-6">
-                  <div className="w-16 h-16 rounded-3xl bg-gold/10 flex items-center justify-center text-2xl">
+              <div className="p-6 md:p-8 border-b border-slate/50 flex flex-col sm:flex-row sm:items-center justify-between bg-ink/30 gap-6">
+                <div className="flex items-center gap-4 md:gap-6">
+                  <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl md:rounded-3xl bg-gold/10 flex items-center justify-center text-xl md:text-2xl">
                     📍
                   </div>
                   <div>
-                    <h2 className="text-3xl font-playfair">{selectedStop.city}, {selectedStop.country}</h2>
-                    <p className="text-sm text-muted">{new Date(selectedStop.arrivalDate).toLocaleDateString()} — {selectedStop.nights} Nights</p>
+                    <h2 className="text-xl md:text-3xl font-playfair">{selectedStop.city}, {selectedStop.country}</h2>
+                    <p className="text-xs text-muted">{new Date(selectedStop.arrivalDate).toLocaleDateString()} — {selectedStop.nights} Nights</p>
                   </div>
                 </div>
 
-                <button 
-                  onClick={() => setIsAddingActivity(true)}
-                  className="bg-gold hover:bg-gold-light text-obsidian px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-gold/10"
-                >
-                  <Plus className="w-5 h-5" />
-                  Add Activity
-                </button>
+                <div className="flex items-center gap-3">
+                  <button 
+                    onClick={() => setSelectedStopId(null)}
+                    className="md:hidden flex-1 px-4 py-3 rounded-2xl font-bold text-xs border border-slate/50 text-muted"
+                  >
+                    Back
+                  </button>
+                  <button 
+                    onClick={() => setIsAddingActivity(true)}
+                    className="flex-1 sm:flex-initial bg-gold hover:bg-gold-light text-obsidian px-5 md:px-6 py-3 rounded-2xl font-bold text-xs md:text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-gold/10"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Activity
+                  </button>
+                </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-8 no-scrollbar">
+              <div className="flex-1 overflow-y-auto p-6 md:p-8 no-scrollbar">
                 <div className="space-y-4">
                   <AnimatePresence mode="popLayout">
                     {activities.filter(a => a.stopId === selectedStopId).length > 0 ? (
@@ -216,39 +240,39 @@ export default function ItineraryBuilder() {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="p-5 rounded-3xl bg-slate/20 border border-slate/50 hover:border-gold/30 transition-all flex items-center gap-6 group"
+                            className="p-4 md:p-5 rounded-3xl bg-slate/20 border border-slate/50 hover:border-gold/30 transition-all flex items-center gap-4 md:gap-6 group"
                           >
-                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center bg-${typeInfo?.color}/10`}>
-                              {typeInfo && <typeInfo.icon className={`w-6 h-6 text-${typeInfo.color}`} />}
+                            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl flex items-center justify-center bg-${typeInfo?.color}/10 shrink-0`}>
+                              {typeInfo && <typeInfo.icon className={`w-5 h-5 md:w-6 md:h-6 text-${typeInfo.color}`} />}
                             </div>
                             
-                            <div className="flex-1">
-                              <div className="flex items-center gap-3">
-                                <h4 className="font-medium text-lg">{activity.name}</h4>
-                                <span className={`px-2 py-0.5 rounded-lg text-[9px] uppercase tracking-widest font-bold bg-${typeInfo?.color}/10 text-${typeInfo?.color}`}>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <h4 className="font-medium text-base md:text-lg truncate">{activity.name}</h4>
+                                <span className={`px-2 py-0.5 rounded-lg text-[8px] uppercase tracking-widest font-bold bg-${typeInfo?.color}/10 text-${typeInfo?.color} whitespace-nowrap`}>
                                   {activity.type}
                                 </span>
                               </div>
-                              <div className="flex items-center gap-4 mt-1 text-xs text-muted">
-                                <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {activity.time} • {activity.duration}m</span>
+                              <div className="flex items-center gap-3 mt-1 text-[10px] text-muted">
+                                <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {activity.time}</span>
                                 <span className="flex items-center gap-1"><CircleDollarSign className="w-3 h-3" /> ${activity.cost}</span>
                               </div>
                             </div>
 
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2">
                               <button 
                                 onClick={() => updateActivity(activity.id, { isBooked: !activity.isBooked })}
-                                className={`w-10 h-10 rounded-full flex items-center justify-center border transition-all ${
+                                className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border transition-all ${
                                   activity.isBooked ? 'bg-emerald/20 border-emerald text-emerald' : 'border-slate/50 text-muted hover:border-gold/50'
                                 }`}
                               >
-                                <Check className="w-5 h-5" />
+                                <Check className="w-4 h-4 md:w-5 md:h-5" />
                               </button>
                               <button 
                                 onClick={() => deleteActivity(activity.id)}
-                                className="w-10 h-10 rounded-full flex items-center justify-center border border-slate/50 text-muted hover:text-ruby hover:border-ruby/50 transition-all opacity-0 group-hover:opacity-100"
+                                className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border border-slate/50 text-muted hover:text-ruby hover:border-ruby/50 transition-all opacity-0 group-hover:opacity-100"
                               >
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             </div>
                           </motion.div>
@@ -256,8 +280,8 @@ export default function ItineraryBuilder() {
                       })
                     ) : (
                       <div className="py-20 text-center space-y-4 opacity-50">
-                        <ActivityIcon className="w-12 h-12 text-muted mx-auto" />
-                        <p className="text-muted italic">No activities planned for this stop yet.</p>
+                        <ActivityIcon className="w-10 h-10 text-muted mx-auto" />
+                        <p className="text-sm text-muted italic">No activities planned for this stop yet.</p>
                       </div>
                     )}
                   </AnimatePresence>
@@ -265,10 +289,10 @@ export default function ItineraryBuilder() {
               </div>
             </>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-center p-12 opacity-50">
-              <MapPin className="w-16 h-16 text-muted mb-4" />
-              <h3 className="text-2xl font-playfair">Select a stop to begin</h3>
-              <p className="text-muted">Plan your daily activities for each destination in your journey.</p>
+            <div className="flex-1 flex flex-col items-center justify-center text-center p-8 md:p-12 opacity-50">
+              <MapPin className="w-12 h-12 md:w-16 md:h-16 text-muted mb-4" />
+              <h3 className="text-xl md:text-2xl font-playfair">Select a stop to begin</h3>
+              <p className="text-sm text-muted">Plan your daily activities for each destination in your journey.</p>
             </div>
           )}
         </div>
@@ -277,7 +301,7 @@ export default function ItineraryBuilder() {
       {/* Add Activity Modal */}
       <AnimatePresence>
         {isAddingActivity && (
-          <div className="fixed inset-0 z-[70] flex items-center justify-center p-8">
+          <div className="fixed inset-0 z-[70] flex items-end md:items-center justify-center p-0 md:p-8">
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -286,10 +310,10 @@ export default function ItineraryBuilder() {
               className="absolute inset-0 bg-obsidian/80 backdrop-blur-sm" 
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              initial={{ opacity: 0, scale: 0.9, y: 100 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-xl glass-card rounded-[3rem] p-10 shadow-2xl border-gold/20"
+              exit={{ opacity: 0, scale: 0.9, y: 100 }}
+              className="relative w-full max-w-xl bg-ink md:glass-card rounded-t-[3rem] md:rounded-[3rem] p-8 md:p-10 shadow-2xl border-gold/20"
             >
               <div className="flex items-center justify-between mb-8">
                 <h3 className="text-2xl font-playfair">New Activity</h3>
@@ -300,7 +324,7 @@ export default function ItineraryBuilder() {
 
               <form onSubmit={handleAddActivity} className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-widest text-muted font-bold">Activity Name</label>
+                  <label className="text-[10px] uppercase tracking-widest text-muted font-bold ml-1">Activity Name</label>
                   <input 
                     autoFocus
                     type="text" 
@@ -308,18 +332,18 @@ export default function ItineraryBuilder() {
                     onChange={(e) => setNewActivity({ ...newActivity, name: e.target.value })}
                     required
                     placeholder="e.g., Louvre Museum Guided Tour"
-                    className="w-full bg-slate/20 border border-slate/50 rounded-2xl p-4 focus:border-gold outline-none transition-all"
+                    className="w-full bg-slate/20 border border-slate/50 rounded-2xl p-4 focus:border-gold outline-none transition-all text-sm"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-muted font-bold">Type</label>
+                    <label className="text-[10px] uppercase tracking-widest text-muted font-bold ml-1">Type</label>
                     <div className="relative">
                       <select 
                         value={newActivity.type}
                         onChange={(e) => setNewActivity({ ...newActivity, type: e.target.value as any })}
-                        className="w-full bg-slate/20 border border-slate/50 rounded-2xl p-4 focus:border-gold outline-none transition-all appearance-none"
+                        className="w-full bg-slate/20 border border-slate/50 rounded-2xl p-4 focus:border-gold outline-none transition-all appearance-none text-sm"
                       >
                         {ACTIVITY_TYPES.map(t => (
                           <option key={t.value} value={t.value} className="bg-ink">{t.label}</option>
@@ -329,14 +353,14 @@ export default function ItineraryBuilder() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-muted font-bold">Cost</label>
+                    <label className="text-[10px] uppercase tracking-widest text-muted font-bold ml-1">Cost</label>
                     <div className="relative">
                       <CircleDollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gold" />
                       <input 
                         type="number" 
                         value={newActivity.cost}
                         onChange={(e) => setNewActivity({ ...newActivity, cost: parseFloat(e.target.value) })}
-                        className="w-full bg-slate/20 border border-slate/50 rounded-2xl py-4 pl-12 pr-4 focus:border-gold outline-none transition-all"
+                        className="w-full bg-slate/20 border border-slate/50 rounded-2xl py-4 pl-12 pr-4 focus:border-gold outline-none transition-all text-sm"
                       />
                     </div>
                   </div>
@@ -344,28 +368,28 @@ export default function ItineraryBuilder() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-muted font-bold">Time</label>
+                    <label className="text-[10px] uppercase tracking-widest text-muted font-bold ml-1">Time</label>
                     <input 
                       type="time" 
                       value={newActivity.time}
                       onChange={(e) => setNewActivity({ ...newActivity, time: e.target.value })}
-                      className="w-full bg-slate/20 border border-slate/50 rounded-2xl p-4 focus:border-gold outline-none transition-all"
+                      className="w-full bg-slate/20 border border-slate/50 rounded-2xl p-4 focus:border-gold outline-none transition-all text-sm [color-scheme:dark]"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-muted font-bold">Duration (min)</label>
+                    <label className="text-[10px] uppercase tracking-widest text-muted font-bold ml-1">Duration (min)</label>
                     <input 
                       type="number" 
                       value={newActivity.duration}
                       onChange={(e) => setNewActivity({ ...newActivity, duration: parseInt(e.target.value) })}
-                      className="w-full bg-slate/20 border border-slate/50 rounded-2xl p-4 focus:border-gold outline-none transition-all"
+                      className="w-full bg-slate/20 border border-slate/50 rounded-2xl p-4 focus:border-gold outline-none transition-all text-sm"
                     />
                   </div>
                 </div>
 
                 <button 
                   type="submit" 
-                  className="w-full bg-gold hover:bg-gold-light text-obsidian font-bold py-4 rounded-2xl transition-all shadow-lg shadow-gold/20 flex items-center justify-center gap-2"
+                  className="w-full bg-gold hover:bg-gold-light text-obsidian font-bold py-4 rounded-2xl transition-all shadow-lg shadow-gold/20 flex items-center justify-center gap-2 text-sm"
                 >
                   Confirm Activity
                 </button>
