@@ -1,8 +1,8 @@
-# Traveloop Project Dependencies
-# Note: This project primarily uses Node.js and npm (package.json).
-# These are the main dependencies for the backend:
+# Python Backend Dependencies
 
-express
-cors
-pg
-dotenv
+fastapi
+uvicorn
+psycopg2-binary
+python-dotenv
+bcrypt
+PyJWT
