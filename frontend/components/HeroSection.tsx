@@ -2,10 +2,11 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { StarsCanvas } from './Stars';
 import Image from 'next/image';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
 
 export function HeroSection() {
+  const router = useRouter();
   const logoText = "TRAVELOOP ✈".split("");
   const containerRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
@@ -71,30 +72,36 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 1.8 }}
-          className="flex flex-col sm:flex-row items-center gap-8"
+          className="flex flex-col sm:flex-row items-center gap-8 relative z-30"
         >
-          <Link href="/dashboard" className="relative group">
-            <button className="px-8 py-4 rounded-full border border-gold/40 font-sans text-[10px] tracking-[0.3em] uppercase transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.3)] bg-gold/5 overflow-hidden relative">
-               <span className="relative z-10 font-bold group-hover:text-black transition-colors duration-300">Start Exploring</span>
-               <div className="absolute inset-0 w-full h-full bg-gold transform scale-y-0 origin-bottom group-hover:scale-y-100 transition-transform duration-500 ease-in-out z-0" />
-            </button>
-          </Link>
+          <button 
+            onClick={() => router.push('/dashboard')}
+            className="px-8 py-4 rounded-full border border-gold/40 font-sans text-[10px] tracking-[0.3em] uppercase transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.3)] bg-gold/5 overflow-hidden relative group z-30"
+          >
+             <span className="relative z-10 font-bold group-hover:text-black transition-colors duration-300">Start Exploring</span>
+             <div className="absolute inset-0 w-full h-full bg-gold transform scale-y-0 origin-bottom group-hover:scale-y-100 transition-transform duration-500 ease-in-out z-0" />
+          </button>
           
-          <button className="text-[10px] font-sans tracking-[0.3em] uppercase text-gray-400 hover:text-white transition-colors duration-300 border-b border-transparent hover:border-white/50 pb-1 font-bold">
+          <button className="relative z-30 text-[10px] font-sans tracking-[0.3em] uppercase text-gray-400 hover:text-white transition-colors duration-300 border-b border-transparent hover:border-white/50 pb-1 font-bold">
              Watch Experience
           </button>
         </motion.div>
-      </div>
 
-      {/* Scroll indicator */}
-      <motion.div 
-        animate={{ y: [0, 10, 0], opacity: [0.5, 1, 0.5] }}
-        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-12 z-20 flex flex-col items-center gap-2"
-      >
-        <span className="text-[9px] uppercase tracking-[0.2em] text-gray-500 font-medium">Drag to move / Scroll</span>
-        <div className="w-[1px] h-12 bg-gradient-to-b from-gray-500 to-transparent" />
-      </motion.div>
+        {/* Scroll hint moved here */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.5 }}
+          transition={{ duration: 1, delay: 2.2 }}
+          className="mt-16 flex flex-col items-center gap-3"
+        >
+          <span className="text-[11px] uppercase tracking-[0.4em] text-gray-400 font-medium">Drag to move / Scroll</span>
+          <motion.div 
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="w-[1px] h-10 bg-gradient-to-b from-gray-500 to-transparent" 
+          />
+        </motion.div>
+      </div>
     </section>
   );
 }
