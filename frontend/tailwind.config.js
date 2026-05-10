@@ -8,9 +8,18 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        obsidian: '#0a0a0a',
-        charcoal: '#111111',
-        gold: '#D4AF37',
+        obsidian: '#0A0A0F',
+        ink: '#111118',
+        slate: '#1A1A28',
+        gold: {
+          DEFAULT: '#C9A84C',
+          light: '#E8C96A',
+        },
+        teal: '#2DD4BF',
+        cream: '#F5F0E8',
+        muted: '#6B6B7A',
+        ruby: '#E85D75',
+        emerald: '#10B981',
       },
       fontFamily: {
         playfair: ['var(--font-playfair)', 'serif'],

@@ -1,13 +1,14 @@
 'use client';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 const features = [
-  { title: "Itinerary Builder", desc: "Drag-and-drop days, events, and reservations into a seamless timeline.", icon: "01" },
-  { title: "Wealth Planner", desc: "Forecast and manage expenditures with multi-currency intelligent conversion.", icon: "02" },
-  { title: "Cinematic Journal", desc: "Immortalize experiences in a rich media format that looks like editorial magazines.", icon: "03" },
-  { title: "Shared Voyages", desc: "Collaborate with travel partners in real-time, assigning roles and tasks.", icon: "04" },
-  { title: "Concierge AI", desc: "Tailored recommendations powered by models trained on luxury hospitality.", icon: "05" },
-  { title: "Digital Vault", desc: "Encrypted storage for passports, visas, and critical travel documentation.", icon: "06" }
+  { title: "Itinerary Builder", desc: "Drag-and-drop days, events, and reservations into a seamless timeline.", icon: "01", href: "/trips" },
+  { title: "Wealth Planner", desc: "Forecast and manage expenditures with multi-currency intelligent conversion.", icon: "02", href: "/budget" },
+  { title: "Cinematic Journal", desc: "Immortalize experiences in a rich media format that looks like editorial magazines.", icon: "03", href: "/journal" },
+  { title: "Shared Voyages", desc: "Collaborate with travel partners in real-time, assigning roles and tasks.", icon: "04", href: "/explore/cities" },
+  { title: "Concierge AI", desc: "Tailored recommendations powered by models trained on luxury hospitality.", icon: "05", href: "/analytics" },
+  { title: "Digital Vault", desc: "Encrypted storage for passports, visas, and critical travel documentation.", icon: "06", href: "/checklist" }
 ];
 
 export function FeaturesSection() {
@@ -46,22 +47,26 @@ export function FeaturesSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-5%" }}
               transition={{ duration: 0.8, delay: i * 0.1, ease: [0.215, 0.61, 0.355, 1] }}
-              className="glass p-10 flex flex-col relative overflow-hidden group cursor-pointer hover:-translate-y-2 transition-transform duration-500 rounded-2xl"
+              className="flex"
             >
-              <div className="absolute top-0 right-0 p-8 transform translate-x-4 -translate-y-4 text-white/5 font-playfair text-9xl font-bold transition-all duration-700 group-hover:text-gold/10 group-hover:translate-x-0 group-hover:translate-y-0">
-                {feat.icon}
-              </div>
-              <div className="relative z-10 flex-1">
-                <span className="font-sans text-gold/80 text-xs tracking-widest font-semibold block mb-8">
-                  {feat.icon.padStart(2, '0')}
-                </span>
-                <h3 className="font-playfair text-2xl font-medium mb-4">{feat.title}</h3>
-                <p className="font-sans text-gray-400 font-light text-sm leading-relaxed">
-                  {feat.desc}
-                </p>
-              </div>
-              
-              <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-gold/50 to-transparent transform scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-700 ease-in-out" />
+              <Link href={feat.href} className="flex-1">
+                <div className="glass p-10 flex flex-col h-full relative overflow-hidden group cursor-pointer hover:-translate-y-2 transition-transform duration-500 rounded-2xl">
+                  <div className="absolute top-0 right-0 p-8 transform translate-x-4 -translate-y-4 text-white/5 font-playfair text-9xl font-bold transition-all duration-700 group-hover:text-gold/10 group-hover:translate-x-0 group-hover:translate-y-0">
+                    {feat.icon}
+                  </div>
+                  <div className="relative z-10 flex-1">
+                    <span className="font-sans text-gold/80 text-xs tracking-widest font-semibold block mb-8">
+                      {feat.icon.padStart(2, '0')}
+                    </span>
+                    <h3 className="font-playfair text-2xl font-medium mb-4">{feat.title}</h3>
+                    <p className="font-sans text-gray-400 font-light text-sm leading-relaxed">
+                      {feat.desc}
+                    </p>
+                  </div>
+                  
+                  <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-gold/50 to-transparent transform scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-700 ease-in-out" />
+                </div>
+              </Link>
             </motion.div>
           ))}
         </div>

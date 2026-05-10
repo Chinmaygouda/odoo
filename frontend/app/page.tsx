@@ -7,11 +7,13 @@ import { PremiumSection } from '@/components/PremiumSection';
 import { TestimonialsSection } from '@/components/TestimonialsSection';
 import { FinalCTASection, Footer } from '@/components/FinalCTASection';
 import { CustomCursor } from '@/components/CustomCursor';
+import { Navbar } from '@/components/Navbar';
 
 export default function Home() {
   return (
     <main className="bg-obsidian min-h-screen text-white">
       <CustomCursor />
+      <Navbar />
       <HeroSection />
       <StorySection />
       <GlobeSection />
