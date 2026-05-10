@@ -1,0 +1,8 @@
+# Traveloop Project Dependencies
+# Note: This project primarily uses Node.js and npm (package.json).
+# These are the main dependencies for the backend:
+
+express
+cors
+pg
+dotenv
