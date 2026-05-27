@@ -75,20 +75,23 @@ def generate_trip(req: schemas.TripGenerateRequest, db: Session = Depends(get_db
         
         prompt = f"""
         You are an expert travel planner. I am taking a {days}-day trip to {req.destination_city}, {req.destination_country}.
-        I need a realistic itinerary with 2 activities per day. 
+        I need a highly practical, realistically paced, and well-organized itinerary with exactly 2 activities per day. 
+        Do not make the schedule too congested.
         My total daily activity budget is {daily_activity_budget} {req.currency}.
+        
+        Crucially, provide realistic transit and travel options for getting to the activities or navigating the city if the user does not have a personal vehicle. Include specific bus/train options, transit duration, where to board, where to get down, or walking instructions. Put these transit details directly into the "name" field.
         
         Please return a strictly formatted JSON array of objects. Do not include markdown formatting like ```json.
         Each object should represent one activity and have the following exact keys:
         - "day": integer (1 to {days})
-        - "name": string (a specific realistic place or activity in {req.destination_city})
+        - "name": string (A specific place or activity, MUST include practical transit details e.g., "Louvre Museum (Take Metro Line 1 to Palais Royal Musée du Louvre, 15 min)")
         - "time_of_day": string (either "Morning" or "Afternoon")
-        - "cost": float (estimated realistic cost in {req.currency}, make sure it roughly fits the budget)
+        - "cost": float (estimated realistic cost in {req.currency}, roughly fitting the budget)
         - "type": string (must be one of: "Sightseeing", "Food", "Adventure", "Culture", "Shopping")
         
         Example:
         [
-          {{"day": 1, "name": "Visit the Eiffel Tower", "time_of_day": "Morning", "cost": 30.0, "type": "Sightseeing"}}
+          {{"day": 1, "name": "Visit the Eiffel Tower (Take Bus 82 from city center, get down at Tour Eiffel, 20 min transit)", "time_of_day": "Morning", "cost": 30.0, "type": "Sightseeing"}}
         ]
         """
         

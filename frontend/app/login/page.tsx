@@ -97,7 +97,20 @@ export default function LoginPage() {
     }
   };
 
-  const continueAsGuest = () => {
+  const continueAsGuest = async () => {
+    try {
+      // Silently get a real backend token for the guest session
+      const res = await fetch('http://127.0.0.1:8000/auth/guest-session', {
+        method: 'POST',
+      });
+      if (res.ok) {
+        const data = await res.json();
+        localStorage.setItem('access_token', data.access_token);
+      }
+    } catch (e) {
+      // Continue anyway - backend may not be reachable
+      console.warn('Guest session token fetch failed:', e);
+    }
     login({
       id: 'guest',
       name: 'Guest Traveler',

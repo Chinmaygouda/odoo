@@ -29,7 +29,6 @@ const navItems = [
   { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
   { label: 'New Trip', icon: PlusCircle, href: '/trips/new' },
   { label: 'My Trips', icon: MapIcon, href: '/trips' },
-  { label: 'Builder', icon: Settings, href: '/trips' },
   { label: 'Timeline', icon: BookOpen, href: '/trips' },
   { label: 'Explore', icon: Search, href: '/explore/cities' },
   { label: 'Activities', icon: Compass, href: '/explore/activities' },

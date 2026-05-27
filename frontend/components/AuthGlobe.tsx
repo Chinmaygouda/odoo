@@ -46,7 +46,7 @@ function WormholeCanvas() {
 
     // --- Radar sweep ---
     const sweepAngle = time * 0.4;
-    const sweepGrad = ctx.createConicalGradient
+    const sweepGrad = (ctx as any).createConicGradient
       ? null
       : ctx.createLinearGradient(cx, cy, cx + 300 * Math.cos(sweepAngle), cy + 300 * Math.sin(sweepAngle));
 

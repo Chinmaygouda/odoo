@@ -177,9 +177,9 @@ export default function MyTrips() {
                 </div>
 
                 <div className="flex gap-3">
-                  <Link href={`/trips/${trip.id}/builder`}>
+                  <Link href={`/trips/${trip.id}/timeline`}>
                     <button className="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest border border-slate/50 hover:bg-slate/50 transition-all">
-                      Builder
+                      Timeline
                     </button>
                   </Link>
                   <Link href={`/trips/${trip.id}/view`}>

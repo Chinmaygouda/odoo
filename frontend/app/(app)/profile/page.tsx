@@ -15,7 +15,9 @@ import {
   Camera,
   LogOut,
   MapPin,
-  Smartphone
+  Smartphone,
+  Navigation,
+  Loader2
 } from 'lucide-react';
 import { useAuth } from '@/lib/hooks';
 import { toast } from '@/components/Toast';
@@ -32,6 +34,36 @@ export default function ProfilePage() {
     city: user?.city || '',
     country: user?.country || '',
   });
+
+  const [isLocating, setIsLocating] = useState(false);
+
+  const handleDetectLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error('Geolocation is not supported by your browser');
+      return;
+    }
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json`);
+          const data = await res.json();
+          const city = data.address.city || data.address.town || data.address.village || data.address.state_district || '';
+          const country = data.address.country || '';
+          setProfileForm(prev => ({ ...prev, city, country }));
+          toast.success('Location detected successfully');
+        } catch (error) {
+          toast.error('Failed to resolve location');
+        } finally {
+          setIsLocating(false);
+        }
+      },
+      (error) => {
+        toast.error('Unable to retrieve your location');
+        setIsLocating(false);
+      }
+    );
+  };
 
   const [prefForm, setPrefForm] = useState({
     currency: user?.currency || 'USD',
@@ -165,7 +197,18 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-widest text-muted font-bold ml-1">Location</label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs uppercase tracking-widest text-muted font-bold ml-1">Location</label>
+                    <button 
+                      type="button" 
+                      onClick={handleDetectLocation}
+                      disabled={isLocating}
+                      className="text-xs flex items-center gap-1 text-gold hover:text-gold-light transition-colors"
+                    >
+                      {isLocating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Navigation className="w-3 h-3" />}
+                      Detect Live Location
+                    </button>
+                  </div>
                   <div className="relative">
                     <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
                     <input 

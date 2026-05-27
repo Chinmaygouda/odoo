@@ -153,9 +153,9 @@ export default function Dashboard() {
                           <span>{trip.status}</span>
                         </div>
                       </div>
-                      <Link href={`/trips/${trip.id}/builder`}>
+                      <Link href={`/trips/${trip.id}/timeline`}>
                         <button className="text-[10px] uppercase tracking-widest text-gold hover:text-gold-light font-bold">
-                          Builder
+                          Timeline
                         </button>
                       </Link>
                     </div>

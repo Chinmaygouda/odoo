@@ -28,6 +28,9 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
+class GoogleAuthRequest(BaseModel):
+    token: str
+
 class UserPreferencesUpdate(BaseModel):
     currency: Optional[str] = None
     language: Optional[str] = None
