@@ -44,6 +44,9 @@ class Trip(Base):
     budget = Column(Float)
     currency = Column(String, default="USD")
     cover_image_url = Column(String, nullable=True)
+    custom_map_url = Column(String, nullable=True)
+    emoji = Column(String, nullable=True)
+    description = Column(Text, nullable=True)
     is_public = Column(Boolean, default=False)
     share_token = Column(String, unique=True, index=True, nullable=True)
 
@@ -59,6 +62,10 @@ class TripStop(Base):
     trip_id = Column(Integer, ForeignKey("trips.id"))
     city = Column(String)
     country = Column(String)
+    arrival_date = Column(DateTime, nullable=True)
+    departure_date = Column(DateTime, nullable=True)
+    nights = Column(Integer, default=0)
+    notes = Column(Text, nullable=True)
     order_index = Column(Integer)
 
     trip = relationship("Trip", back_populates="stops")
@@ -70,6 +77,7 @@ class Activity(Base):
     stop_id = Column(Integer, ForeignKey("trip_stops.id"))
     name = Column(String)
     time = Column(DateTime, nullable=True)
+    duration = Column(Integer, default=0) # duration in minutes
     cost = Column(Float, default=0.0)
     type = Column(String) # e.g., Sightseeing, Food
     booking_status = Column(Enum(BookingStatus), default=BookingStatus.none)
@@ -126,3 +134,12 @@ class JournalMedia(Base):
     type = Column(String) # photo, video
 
     entry = relationship("JournalEntry", back_populates="media")
+
+class TripInsight(Base):
+    __tablename__ = "trip_insights"
+    id = Column(Integer, primary_key=True, index=True)
+    trip_id = Column(Integer, ForeignKey("trips.id"))
+    insight = Column(Text)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+    trip = relationship("Trip", backref="insights")

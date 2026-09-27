@@ -1,12 +1,20 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
 from typing import List
+import os
+import uuid
+import shutil
 
 from .. import models, schemas
 from ..database import get_db
 from .auth import get_current_user
 
 router = APIRouter(prefix="/trips", tags=["journal"])
+
+@router.get("/journal/all", response_model=List[schemas.JournalEntry])
+def get_all_user_journal_entries(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    """Fetch all journal entries across all trips belonging to the current user."""
+    return db.query(models.JournalEntry).join(models.Trip).filter(models.Trip.owner_id == current_user.id).order_by(models.JournalEntry.date.desc()).all()
 
 @router.post("/{trip_id}/journal", response_model=schemas.JournalEntry)
 def create_journal_entry(trip_id: int, entry: schemas.JournalEntryCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
@@ -63,3 +71,45 @@ def delete_journal_entry(trip_id: int, entry_id: int, db: Session = Depends(get_
     db.delete(db_entry)
     db.commit()
     return {"ok": True}
+
+@router.post("/{trip_id}/journal/{entry_id}/media", response_model=schemas.JournalMedia)
+def upload_journal_media(
+    trip_id: int,
+    entry_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    """Upload photos or media to attach to a journal entry."""
+    db_entry = db.query(models.JournalEntry).join(models.Trip).filter(
+        models.JournalEntry.id == entry_id,
+        models.Trip.id == trip_id,
+        models.Trip.owner_id == current_user.id
+    ).first()
+    if not db_entry:
+        raise HTTPException(status_code=404, detail="Journal entry not found")
+
+    ext = os.path.splitext(file.filename or "")[1].lower() or ".jpg"
+    filename = f"journal_{uuid.uuid4().hex}{ext}"
+    
+    # Path to uploads/journal in project root
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    uploads_dir = os.path.join(base_dir, "uploads", "journal")
+    os.makedirs(uploads_dir, exist_ok=True)
+    
+    file_path = os.path.join(uploads_dir, filename)
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    media_url = f"/uploads/journal/{filename}"
+    media_type = "video" if ext in [".mp4", ".mov", ".webm"] else "photo"
+
+    db_media = models.JournalMedia(
+        entry_id=entry_id,
+        url=media_url,
+        type=media_type
+    )
+    db.add(db_media)
+    db.commit()
+    db.refresh(db_media)
+    return db_media

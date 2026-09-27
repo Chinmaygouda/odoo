@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { apiFetch } from '@/app/lib/api';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plane, Mail, Lock, User as UserIcon, ArrowRight, Github } from 'lucide-react';
@@ -38,7 +39,7 @@ export default function LoginPage() {
         formData.append('username', email);
         formData.append('password', password);
         
-        const response = await fetch('http://127.0.0.1:8000/auth/login', {
+        const response = await apiFetch('/auth/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -51,7 +52,7 @@ export default function LoginPage() {
           localStorage.setItem('access_token', data.access_token);
           
           // Get user details
-          const userResp = await fetch('http://127.0.0.1:8000/users/me', {
+          const userResp = await apiFetch('/users/me', {
             headers: { 'Authorization': `Bearer ${data.access_token}` }
           });
           const userData = await userResp.json();
@@ -70,7 +71,7 @@ export default function LoginPage() {
         }
       } else {
         // Call backend register API
-        const response = await fetch('http://127.0.0.1:8000/auth/register', {
+        const response = await apiFetch('/auth/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -100,7 +101,7 @@ export default function LoginPage() {
   const continueAsGuest = async () => {
     try {
       // Silently get a real backend token for the guest session
-      const res = await fetch('http://127.0.0.1:8000/auth/guest-session', {
+      const res = await apiFetch('/auth/guest-session', {
         method: 'POST',
       });
       if (res.ok) {
@@ -287,7 +288,7 @@ export default function LoginPage() {
               <GoogleLogin
                 onSuccess={async (credentialResponse) => {
                   try {
-                    const res = await fetch('http://127.0.0.1:8000/auth/google', {
+                    const res = await apiFetch('/auth/google', {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
@@ -299,7 +300,7 @@ export default function LoginPage() {
                       const data = await res.json();
                       localStorage.setItem('access_token', data.access_token);
                       
-                      const userResp = await fetch('http://127.0.0.1:8000/users/me', {
+                      const userResp = await apiFetch('/users/me', {
                         headers: { 'Authorization': `Bearer ${data.access_token}` }
                       });
                       const userData = await userResp.json();

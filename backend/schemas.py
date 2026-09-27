@@ -45,6 +45,7 @@ class User(UserBase):
 class ActivityBase(BaseModel):
     name: str
     time: Optional[datetime] = None
+    duration: int = 0
     cost: float = 0.0
     type: str
     booking_status: BookingStatus = BookingStatus.none
@@ -69,6 +70,10 @@ class Activity(ActivityBase):
 class TripStopBase(BaseModel):
     city: str
     country: str
+    arrival_date: Optional[datetime] = None
+    departure_date: Optional[datetime] = None
+    nights: int = 0
+    notes: Optional[str] = None
     order_index: int
 
 class TripStopCreate(TripStopBase):
@@ -77,6 +82,10 @@ class TripStopCreate(TripStopBase):
 class TripStopUpdate(BaseModel):
     city: Optional[str] = None
     country: Optional[str] = None
+    arrival_date: Optional[datetime] = None
+    departure_date: Optional[datetime] = None
+    nights: Optional[int] = None
+    notes: Optional[str] = None
     order_index: Optional[int] = None
 
 class TripStop(TripStopBase):
@@ -178,6 +187,9 @@ class TripBase(BaseModel):
     budget: float
     currency: str = "USD"
     cover_image_url: Optional[str] = None
+    custom_map_url: Optional[str] = None
+    emoji: Optional[str] = None
+    description: Optional[str] = None
 
 class TripCreate(TripBase):
     pass
@@ -190,6 +202,9 @@ class TripUpdate(BaseModel):
     budget: Optional[float] = None
     currency: Optional[str] = None
     cover_image_url: Optional[str] = None
+    custom_map_url: Optional[str] = None
+    emoji: Optional[str] = None
+    description: Optional[str] = None
     is_public: Optional[bool] = None
 
 class TripGenerateRequest(BaseModel):
@@ -224,5 +239,20 @@ class TripSummary(BaseModel):
     budget: float
     currency: str
     cover_image_url: Optional[str] = None
+    custom_map_url: Optional[str] = None
+    emoji: Optional[str] = None
+    class Config:
+        from_attributes = True
+
+class TripInsightBase(BaseModel):
+    insight: str
+
+class TripInsightCreate(TripInsightBase):
+    pass
+
+class TripInsight(TripInsightBase):
+    id: int
+    trip_id: int
+    created_at: datetime
     class Config:
         from_attributes = True

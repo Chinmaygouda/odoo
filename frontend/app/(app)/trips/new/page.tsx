@@ -3,13 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  X, 
-  ArrowLeft, 
-  ArrowRight, 
-  Check, 
-  MapPin, 
-  Calendar, 
+import {
+  X,
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  MapPin,
+  Calendar,
   CircleDollarSign,
   GripVertical,
   Trash2,
@@ -17,6 +17,7 @@ import {
   ChevronUp,
   ChevronDown
 } from 'lucide-react';
+import { apiFetch } from '@/app/lib/api';
 import { useTrips, useStops, Trip, Stop } from '@/lib/hooks';
 import { toast } from '@/components/Toast';
 
@@ -43,8 +44,8 @@ function CityAutocomplete({ value, onChange, placeholder, onSelectCountry }: { v
 
   return (
     <div className="relative w-full">
-      <input 
-        type="text" 
+      <input
+        type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onFocus={() => setIsFocused(true)}
@@ -54,29 +55,29 @@ function CityAutocomplete({ value, onChange, placeholder, onSelectCountry }: { v
       />
       <AnimatePresence>
         {isFocused && suggestions.length > 0 && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -5 }}
             className="absolute z-50 left-0 right-0 mt-2 bg-ink border border-gold/30 rounded-xl overflow-hidden shadow-lg max-h-48 overflow-y-auto"
           >
             {suggestions.map((s, idx) => {
-               const parts = s.display_name.split(', ');
-               const country = parts[parts.length - 1];
-               const city = s.name || parts[0];
-               return (
-                 <div 
-                   key={idx}
-                   className="px-4 py-2 hover:bg-gold/20 cursor-pointer text-sm text-cream transition-colors border-b border-slate/10 last:border-0"
-                   onClick={() => {
-                     onChange(city);
-                     if (onSelectCountry) onSelectCountry(country);
-                     setSuggestions([]);
-                   }}
-                 >
-                   {city} <span className="text-muted text-[10px] ml-1">({country})</span>
-                 </div>
-               );
+              const parts = s.display_name.split(', ');
+              const country = parts[parts.length - 1];
+              const city = s.name || parts[0];
+              return (
+                <div
+                  key={idx}
+                  className="px-4 py-2 hover:bg-gold/20 cursor-pointer text-sm text-cream transition-colors border-b border-slate/10 last:border-0"
+                  onClick={() => {
+                    onChange(city);
+                    if (onSelectCountry) onSelectCountry(country);
+                    setSuggestions([]);
+                  }}
+                >
+                  {city} <span className="text-muted text-[10px] ml-1">({country})</span>
+                </div>
+              );
             })}
           </motion.div>
         )}
@@ -91,7 +92,7 @@ export default function NewTrip() {
   const { addStop } = useStops();
   const [step, setStep] = useState(1);
   const [validationError, setValidationError] = useState<string | null>(null);
-  
+
   // --- Step 1 State ---
   const [tripInfo, setTripInfo] = useState({
     name: '',
@@ -170,7 +171,7 @@ export default function NewTrip() {
         setValidationError('Time traveler alert! 🕰️ You can\'t end your trip before it even starts. Let\'s fix those dates.');
         return;
       }
-      
+
       // Auto populate first stop arrival date from trip start date if empty
       if (stops[0].arrivalDate === '') {
         const newStops = [...stops];
@@ -202,7 +203,7 @@ export default function NewTrip() {
     let token = localStorage.getItem('access_token');
     if (!token) {
       // Silently get a guest token
-      const res = await fetch('http://127.0.0.1:8000/auth/guest-session', { method: 'POST' });
+      const res = await apiFetch('/auth/guest-session', { method: 'POST' });
       if (res.ok) {
         const data = await res.json();
         token = data.access_token;
@@ -232,7 +233,7 @@ export default function NewTrip() {
       // 1. Get token (silently creates guest session if none exists)
       let token = await getAuthToken();
 
-      let response = await fetch('http://127.0.0.1:8000/trips/generate', {
+      let response = await apiFetch('/trips/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(payload)
@@ -242,13 +243,13 @@ export default function NewTrip() {
       if (response.status === 401) {
         localStorage.removeItem('access_token');
         token = await getAuthToken();
-        response = await fetch('http://127.0.0.1:8000/trips/generate', {
+        response = await apiFetch('/trips/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify(payload)
         });
       }
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error("Backend error response:", errorText);
@@ -316,7 +317,7 @@ export default function NewTrip() {
       toast.success('Your AI journey has been curated.');
       window.dispatchEvent(new Event('local-storage-update'));
       router.push(`/trips/${frontendTripId}/timeline`);
-      
+
     } catch (err: any) {
       console.error(err);
       toast.error(err.message || 'AI Generation failed. Check backend connection.');
@@ -375,7 +376,7 @@ export default function NewTrip() {
 
         <div className="flex items-center gap-4">
           {step > 1 && (
-            <button 
+            <button
               onClick={() => setStep(step - 1)}
               className="px-6 py-2 text-sm text-muted hover:text-cream font-medium"
             >
@@ -383,14 +384,14 @@ export default function NewTrip() {
             </button>
           )}
           {step < 3 ? (
-            <button 
+            <button
               onClick={handleNextStep}
               className="bg-gold hover:bg-gold-light text-obsidian px-8 py-2 rounded-full font-bold transition-all flex items-center gap-2"
             >
               Next Step <ArrowRight className="w-4 h-4" />
             </button>
           ) : (
-            <button 
+            <button
               onClick={handleSubmit}
               className="bg-gold hover:bg-gold-light text-obsidian px-8 py-2 rounded-full font-bold transition-all flex items-center gap-2"
             >
@@ -421,20 +422,20 @@ export default function NewTrip() {
                   <div className="space-y-6">
                     <div className="space-y-2">
                       <label className="text-xs uppercase tracking-[0.2em] text-muted font-bold ml-1">Journey Name</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={tripInfo.name}
                         onChange={(e) => setTripInfo({ ...tripInfo, name: e.target.value })}
                         placeholder="e.g., The Aegean Odyssey"
                         className="w-full bg-slate/20 border border-slate/50 rounded-2xl p-4 focus:outline-none focus:border-gold transition-all"
                       />
                     </div>
-                    
+
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <label className="text-xs uppercase tracking-[0.2em] text-muted font-bold ml-1">Start Date</label>
-                        <input 
-                          type="date" 
+                        <input
+                          type="date"
                           value={tripInfo.startDate}
                           onChange={(e) => setTripInfo({ ...tripInfo, startDate: e.target.value })}
                           className="w-full bg-slate/20 border border-slate/50 rounded-2xl p-4 focus:outline-none focus:border-gold transition-all"
@@ -442,8 +443,8 @@ export default function NewTrip() {
                       </div>
                       <div className="space-y-2">
                         <label className="text-xs uppercase tracking-[0.2em] text-muted font-bold ml-1">End Date</label>
-                        <input 
-                          type="date" 
+                        <input
+                          type="date"
                           value={tripInfo.endDate}
                           onChange={(e) => setTripInfo({ ...tripInfo, endDate: e.target.value })}
                           className="w-full bg-slate/20 border border-slate/50 rounded-2xl p-4 focus:outline-none focus:border-gold transition-all"
@@ -456,7 +457,7 @@ export default function NewTrip() {
                     <div className="space-y-2">
                       <label className="text-xs uppercase tracking-[0.2em] text-muted font-bold ml-1">Budget Allocation</label>
                       <div className="flex gap-2">
-                        <select 
+                        <select
                           value={tripInfo.currency}
                           onChange={(e) => setTripInfo({ ...tripInfo, currency: e.target.value })}
                           className="w-24 bg-slate/20 border border-slate/50 rounded-2xl px-4 py-4 focus:outline-none focus:border-gold transition-all appearance-none cursor-pointer text-center text-sm font-bold"
@@ -469,10 +470,10 @@ export default function NewTrip() {
                         </select>
                         <div className="relative flex-1">
                           <CircleDollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gold" />
-                          <input 
-                            type="number" 
-                            value={tripInfo.budget}
-                            onChange={(e) => setTripInfo({ ...tripInfo, budget: parseFloat(e.target.value) })}
+                          <input
+                            type="number"
+                            value={Number.isNaN(tripInfo.budget) || tripInfo.budget === 0 ? '' : tripInfo.budget}
+                            onChange={(e) => setTripInfo({ ...tripInfo, budget: parseFloat(e.target.value) || 0 })}
                             className="w-full bg-slate/20 border border-slate/50 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:border-gold transition-all"
                           />
                         </div>
@@ -483,7 +484,7 @@ export default function NewTrip() {
                       <label className="text-xs uppercase tracking-[0.2em] text-muted font-bold ml-1">Journey Icon</label>
                       <div className="flex flex-wrap gap-2 p-4 bg-slate/20 border border-slate/50 rounded-2xl">
                         {EMOJIS.map(e => (
-                          <button 
+                          <button
                             key={e}
                             onClick={() => setTripInfo({ ...tripInfo, emoji: e })}
                             className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl hover:bg-gold/20 transition-all ${tripInfo.emoji === e ? 'bg-gold/30 border border-gold/50' : ''}`}
@@ -518,7 +519,7 @@ export default function NewTrip() {
                     <div className="glass-card p-6 rounded-3xl grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-1 z-50">
                         <label className="text-[10px] uppercase font-bold text-muted ml-1">City</label>
-                        <CityAutocomplete 
+                        <CityAutocomplete
                           value={startLocation.city}
                           onChange={(v) => setStartLocation({ ...startLocation, city: v })}
                           onSelectCountry={(c) => setStartLocation(prev => ({ ...prev, country: c }))}
@@ -527,8 +528,8 @@ export default function NewTrip() {
                       </div>
                       <div className="space-y-1">
                         <label className="text-[10px] uppercase font-bold text-muted ml-1">Country</label>
-                        <input 
-                          type="text" 
+                        <input
+                          type="text"
                           value={startLocation.country}
                           onChange={(e) => setStartLocation({ ...startLocation, country: e.target.value })}
                           placeholder="e.g. USA"
@@ -541,72 +542,72 @@ export default function NewTrip() {
                   <label className="text-xs uppercase tracking-[0.2em] text-muted font-bold ml-1">Destination Places</label>
                   <div className="space-y-4">
                     {stops.map((stop, i) => (
-                    <div key={stop.id} className="glass-card p-6 rounded-3xl flex items-center gap-6">
-                      <div className="flex flex-col gap-2">
-                        <button 
-                          onClick={() => handleMoveStopUp(i)}
-                          disabled={i === 0}
-                          className={`p-1 rounded-md transition-colors ${i === 0 ? 'opacity-20 cursor-not-allowed' : 'hover:bg-gold/20 text-muted hover:text-gold'}`}
+                      <div key={stop.id} className="glass-card p-6 rounded-3xl flex items-center gap-6">
+                        <div className="flex flex-col gap-2">
+                          <button
+                            onClick={() => handleMoveStopUp(i)}
+                            disabled={i === 0}
+                            className={`p-1 rounded-md transition-colors ${i === 0 ? 'opacity-20 cursor-not-allowed' : 'hover:bg-gold/20 text-muted hover:text-gold'}`}
+                          >
+                            <ChevronUp className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleMoveStopDown(i)}
+                            disabled={i === stops.length - 1}
+                            className={`p-1 rounded-md transition-colors ${i === stops.length - 1 ? 'opacity-20 cursor-not-allowed' : 'hover:bg-gold/20 text-muted hover:text-gold'}`}
+                          >
+                            <ChevronDown className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
+                          <div className="space-y-1 z-40">
+                            <label className="text-[10px] uppercase font-bold text-muted ml-1">City</label>
+                            <CityAutocomplete
+                              value={stop.city || ''}
+                              onChange={(v) => handleStopChange(stop.id!, 'city', v)}
+                              onSelectCountry={(c) => handleStopChange(stop.id!, 'country', c)}
+                              placeholder="Paris"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[10px] uppercase font-bold text-muted ml-1">Country</label>
+                            <input
+                              type="text"
+                              value={stop.country}
+                              onChange={(e) => handleStopChange(stop.id!, 'country', e.target.value)}
+                              placeholder="France"
+                              className="w-full bg-slate/40 border border-slate/50 rounded-xl px-3 py-2 focus:border-gold outline-none transition-all text-sm"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[10px] uppercase font-bold text-muted ml-1">Nights</label>
+                            <input
+                              type="number"
+                              value={stop.nights}
+                              onChange={(e) => handleStopChange(stop.id!, 'nights', parseInt(e.target.value))}
+                              className="w-full bg-slate/40 border border-slate/50 rounded-xl px-3 py-2 focus:border-gold outline-none transition-all text-sm"
+                            />
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => handleRemoveStop(stop.id!)}
+                          className="text-muted hover:text-ruby transition-colors"
                         >
-                          <ChevronUp className="w-4 h-4" />
-                        </button>
-                        <button 
-                          onClick={() => handleMoveStopDown(i)}
-                          disabled={i === stops.length - 1}
-                          className={`p-1 rounded-md transition-colors ${i === stops.length - 1 ? 'opacity-20 cursor-not-allowed' : 'hover:bg-gold/20 text-muted hover:text-gold'}`}
-                        >
-                          <ChevronDown className="w-4 h-4" />
+                          <Trash2 className="w-5 h-5" />
                         </button>
                       </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
-                        <div className="space-y-1 z-40">
-                          <label className="text-[10px] uppercase font-bold text-muted ml-1">City</label>
-                          <CityAutocomplete 
-                            value={stop.city || ''}
-                            onChange={(v) => handleStopChange(stop.id!, 'city', v)}
-                            onSelectCountry={(c) => handleStopChange(stop.id!, 'country', c)}
-                            placeholder="Paris"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-[10px] uppercase font-bold text-muted ml-1">Country</label>
-                          <input 
-                            type="text" 
-                            value={stop.country}
-                            onChange={(e) => handleStopChange(stop.id!, 'country', e.target.value)}
-                            placeholder="France"
-                            className="w-full bg-slate/40 border border-slate/50 rounded-xl px-3 py-2 focus:border-gold outline-none transition-all text-sm"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-[10px] uppercase font-bold text-muted ml-1">Nights</label>
-                          <input 
-                            type="number" 
-                            value={stop.nights}
-                            onChange={(e) => handleStopChange(stop.id!, 'nights', parseInt(e.target.value))}
-                            className="w-full bg-slate/40 border border-slate/50 rounded-xl px-3 py-2 focus:border-gold outline-none transition-all text-sm"
-                          />
-                        </div>
-                      </div>
+                    ))}
 
-                      <button 
-                        onClick={() => handleRemoveStop(stop.id!)}
-                        className="text-muted hover:text-ruby transition-colors"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
-                  ))}
-
-                  <button 
-                    onClick={handleAddStop}
-                    className="w-full py-4 border-2 border-dashed border-slate/50 rounded-3xl text-muted hover:text-gold hover:border-gold/50 transition-all flex items-center justify-center gap-2 group"
-                  >
-                    <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
-                    <span>Add New Destination Stop</span>
-                  </button>
-                </div>
+                    <button
+                      onClick={handleAddStop}
+                      className="w-full py-4 border-2 border-dashed border-slate/50 rounded-3xl text-muted hover:text-gold hover:border-gold/50 transition-all flex items-center justify-center gap-2 group"
+                    >
+                      <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
+                      <span>Add New Destination Stop</span>
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -629,8 +630,8 @@ export default function NewTrip() {
                   <div className="relative flex items-center justify-center">
                     <svg viewBox="0 0 100 100" className="w-64 h-64 -rotate-90">
                       <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="4" className="text-slate/30" />
-                      <motion.circle 
-                        cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="6" 
+                      <motion.circle
+                        cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="6"
                         className="text-gold"
                         strokeDasharray="283"
                         initial={{ strokeDashoffset: 283 }}

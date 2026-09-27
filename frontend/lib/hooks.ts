@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { apiFetch } from '@/app/lib/api';
 
 // --- Types ---
 
@@ -80,6 +81,7 @@ export interface Trip {
   status: 'All' | 'Upcoming' | 'Ongoing' | 'Completed' | 'Draft';
   description: string;
   shareToken: string;
+  customMapUrl?: string;
   createdAt: number;
 }
 
@@ -250,11 +252,99 @@ export function useChecklist(tripId?: string) {
 
 export function useNotes(tripId?: string) {
   const [allNotes, setAllNotes, isLoaded] = useLocalStorage<Note[]>('tl_notes', []);
-  
-  const notes = tripId ? allNotes.filter(n => n.tripId === tripId) : allNotes;
 
-  const addNote = (note: Note) => setAllNotes([...allNotes, note]);
-  const deleteNote = (id: string) => setAllNotes(allNotes.filter(n => n.id !== id));
+  // Sync from backend on mount and when tripId changes
+  useEffect(() => {
+    async function syncNotes() {
+      try {
+        const endpoint = tripId && tripId !== 'All' 
+          ? `/trips/${tripId}/journal` 
+          : `/trips/journal/all`;
+        const res = await apiFetch(endpoint);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            const mapped: Note[] = data.map((entry: any) => ({
+              id: entry.id.toString(),
+              tripId: entry.trip_id.toString(),
+              stopId: entry.stop_id ? entry.stop_id.toString() : undefined,
+              title: entry.title,
+              content: entry.body,
+              date: entry.date
+            }));
+            
+            // Merge with local notes or update
+            setAllNotes(prev => {
+              const existingIds = new Set(mapped.map(m => m.id));
+              // Keep local notes that haven't synced yet (e.g. non-numeric ids)
+              const unsynced = prev.filter(p => !existingIds.has(p.id) && isNaN(Number(p.id)));
+              return [...mapped, ...unsynced];
+            });
+          }
+        }
+      } catch (err) {
+        console.warn('Backend journal sync failed, relying on localStorage:', err);
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      syncNotes();
+    }
+  }, [tripId, setAllNotes]);
+
+  const notes = tripId && tripId !== 'All' ? allNotes.filter(n => n.tripId === tripId) : allNotes;
+
+  const addNote = async (note: Note) => {
+    // 1. Optimistic update
+    setAllNotes(prev => [note, ...prev]);
+
+    // 2. Persist to backend if numeric tripId
+    try {
+      const tripIdNum = parseInt(note.tripId, 10);
+      if (!isNaN(tripIdNum)) {
+        const payload = {
+          title: note.title,
+          body: note.content,
+          stop_id: note.stopId && !isNaN(parseInt(note.stopId)) ? parseInt(note.stopId) : null,
+          tags: ""
+        };
+        const res = await apiFetch(`/trips/${tripIdNum}/journal`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          const saved = await res.json();
+          // Update the optimistic entry with real server ID and date
+          setAllNotes(prev => prev.map(n => n.id === note.id ? {
+            ...n,
+            id: saved.id.toString(),
+            date: saved.date
+          } : n));
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to save journal entry to backend:', e);
+    }
+  };
+
+  const deleteNote = async (id: string) => {
+    const target = allNotes.find(n => n.id === id);
+    setAllNotes(prev => prev.filter(n => n.id !== id));
+
+    if (target && !isNaN(Number(id))) {
+      try {
+        const tripIdNum = parseInt(target.tripId, 10);
+        if (!isNaN(tripIdNum)) {
+          await apiFetch(`/trips/${tripIdNum}/journal/${id}`, {
+            method: 'DELETE'
+          });
+        }
+      } catch (e) {
+        console.warn('Failed to delete journal entry from backend:', e);
+      }
+    }
+  };
 
   return { notes, addNote, deleteNote, isLoaded };
 }
